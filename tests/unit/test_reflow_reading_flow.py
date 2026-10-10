@@ -67,3 +67,21 @@ def test_padded_uncertain_footer_image_is_a_note_without_transcribing_its_digit(
     skel.regions.append(skeleton.Region('body', lines=[later], bbox=later_box))
     continuing = assemble.assemble([skel], skeleton.BookStyle(body_size=11), [raw])
     assert assemble.source_note_context_figures(continuing, 0) == set()
+
+
+def test_adjacent_uncertain_footer_notes_allow_padding_overlap_and_damaged_raised_marker():
+    body_box=(48,516,384,539)
+    body=extract.Line([extract.Span('The unfinished source sentence continues',11,'ocr',0,body_box)],body_box)
+    first_box=(56,553,288,562);second_box=(56,564.5,288,574)
+    first=extract.Line([extract.Span('* ',4,'ocr',0,(56,553,60,557)),
+        extract.Span('Printed source note without terminal punctuation',8,'ocr',0,(61,553,288,562))],first_box)
+    second=extract.Line([extract.Span("' ",3,'ocr',0,(56,564.5,60,568)),
+        extract.Span('Another printed source note.',8,'ocr',0,(61,564.5,288,574))],second_box)
+    raw=extract.RawPage(0,840,600,[extract.Block(i,l.bbox,[l]) for i,l in enumerate([body,first,second])])
+    regions=[skeleton.Region('body',lines=[body],bbox=body_box)]
+    for line,box in [(first,(53,550,292,566)),(second,(53,562,292,578))]:
+        regions.extend([skeleton.Region('figure',bbox=box,reason='ocr_uncertain_region'),
+            skeleton.Region('artwork',lines=[line],bbox=line.bbox,reason='ocr_uncertain_region')])
+    book=assemble.assemble([skeleton.PageSkeleton(0,840,600,regions=regions)],skeleton.BookStyle(body_size=11),[raw])
+    assert assemble.source_note_context_figures(book,0)=={1,2}
+    assert book.conservation.ok and not book.notes

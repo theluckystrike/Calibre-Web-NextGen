@@ -480,6 +480,24 @@ def source_note_context_figures(book, pno):
     owners={r['line_id']:r for r in inventory['ownership']}
     elements=book.pages.get(pno,[]);proved=set()
     body=[r for r in inventory['regions'] if r['suggested_kind'] in ('body','heading','list')]
+    def raised_opening(line):
+        spans=[s for s in line.spans if s.text.strip()]
+        size=statistics.median(s.size for s in spans
+            for _ in range(min(200,len(s.text.strip())))) if spans else 0
+        # A damaged numeral can look like an apostrophe. This recognizes only
+        # its raised geometry and note territory; it never adopts a reading.
+        return (len(spans)>=2 and re.fullmatch(r"[1-9]\d{0,2}|[*†‡'’]",spans[0].text.strip())
+                and spans[0].size<=size*.75)
+    bottom=max((r['source'].bbox[3] for r in inventory['lines']),default=0)
+    footer_neighbors=set()
+    for asset in inventory['assets']:
+        box=asset['bbox']
+        if box[1]<bottom*.70:continue
+        lines=sorted([r for r in inventory['lines'] if box[0]<=r['source'].bbox[0]
+            and box[1]<=r['source'].bbox[1] and r['source'].bbox[2]<=box[2]
+            and r['source'].bbox[3]<=box[3]],key=lambda r:(r['source'].bbox[1],r['source'].bbox[0]))
+        if lines and raised_opening(lines[0]['source']):
+            footer_neighbors.update(r['id'] for r in lines)
     for index,element in enumerate(elements):
         if element.kind!='fig' or not element.bbox:continue
         if index+1<len(elements) and elements[index+1].kind=='caption':continue
@@ -510,7 +528,8 @@ def source_note_context_figures(book, pno):
             lines=sorted(rows,key=lambda l:(l.bbox[1],l.bbox[0]))
             local=[r['source'] for r in inventory['lines'] if
                 r['source'].bbox[3]<box[1] and r['source'].bbox[2]>box[0]
-                and r['source'].bbox[0]<box[2] and len(r['source'].stripped.split())>=5]
+                and r['source'].bbox[0]<box[2] and len(r['source'].stripped.split())>=5
+                and r['id'] not in footer_neighbors]
             if lines and local:
                 spans=[s for s in lines[0].spans if s.text.strip()]
                 size=statistics.median(s.size for l in lines for s in l.spans
@@ -520,11 +539,11 @@ def source_note_context_figures(book, pno):
                 bottom=max(r['source'].bbox[3] for r in inventory['lines'])
                 later=[r for r in inventory['regions'] if r['suggested_kind'] in ('body','list')
                     and r['bbox'][1]>=box[3] and r['bbox'][0]<box[2] and r['bbox'][2]>box[0]]
-                if (len(spans)>=2 and re.fullmatch(r'[1-9]\d{0,2}|[*†‡]',spans[0].text.strip())
+                if (len(spans)>=2 and raised_opening(lines[0])
                         and spans[0].size<=size*.75 and size<=body_size*.85
                         and box[1]>=bottom*.70 and not later
                         and box[1]-max(l.bbox[3] for l in local)>=body_size*.75
-                        and all(r['id'] in ids for r in inventory['lines'] if
+                        and all(r['id'] in ids or r['id'] in footer_neighbors for r in inventory['lines'] if
                             r['source'].bbox[0]<box[2] and box[0]<r['source'].bbox[2]
                             and r['source'].bbox[1]<box[3] and box[1]<r['source'].bbox[3])
                         and all(box[0]<=l.bbox[0] and box[1]<=l.bbox[1]
