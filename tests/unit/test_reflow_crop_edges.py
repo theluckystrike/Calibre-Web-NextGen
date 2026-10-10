@@ -25,3 +25,35 @@ def test_scan_bar_trim_keeps_list_pixels_and_refuses_rules_or_connected_artwork(
     filled = Image.new('RGB', image.size, 'black')
     assert not crop_edges.scan_borders(filled)
 
+
+def test_primary_and_enlarged_reading_crops_trim_bars_but_original_page_stays_exact(tmp_path):
+    import json, zipfile, pymupdf
+    from cps.services.reflow import assemble, build_epub
+    image = Image.new('1', (824, 362), 1)
+    draw = ImageDraw.Draw(image)
+    draw.rectangle((280, 30, 440, 330), outline=0, width=2)
+    draw.rectangle((710, 8, 775, 354), fill=0)
+    encoded = io.BytesIO(); image.save(encoded, format='PNG')
+    source = tmp_path/'scan.pdf'
+    with pymupdf.open() as doc:
+        page = doc.new_page(width=824, height=362)
+        page.insert_image(page.rect, stream=encoded.getvalue())
+        doc.save(source)
+    element = assemble.Element(kind='fig', pno=0, bbox=(0,0,824,362))
+    book = assemble.Book(pages={0:[element]}, elements=[element],
+        figures=[dict(pno=0,bbox=(0,0,824,362),found='source',needs_ink=False)])
+    target = tmp_path/'scan.epub'
+    with pymupdf.open(source) as doc:
+        build_epub.build(book, target, doc=doc)
+    assert build_epub.validate(target) == []
+    with zipfile.ZipFile(target) as z:
+        payload = json.loads(z.read('META-INF/reflow.json'))
+        evidence = payload['source_evidence'][0]
+        original = Image.open(io.BytesIO(z.read('OEBPS/'+evidence['full'])))
+        assert crop_edges.scan_borders(original)
+        detail = next(d for d in evidence['details'] if d['id']=='figure_0')
+        assert detail['scan_border_trim'] and detail['reading_bbox'][2]<detail['original_reading_bbox'][2]
+        assert not crop_edges.scan_borders(Image.open(io.BytesIO(z.read('OEBPS/'+detail['src']))))
+        primary = next(n for n in z.namelist() if n.startswith('OEBPS/images/fig_p0000_'))
+        assert not crop_edges.scan_borders(Image.open(io.BytesIO(z.read(primary))))
+

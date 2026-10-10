@@ -1971,6 +1971,22 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
                 package.image(src, data, store=True)
             else:
                 package.image(src, data)
+        def reading_crop(rect, data):
+            # Primary artwork and its enlarged inspection must agree. The full
+            # original remains pristine; only detached bars in scan crops are
+            # trimmed. Alternative-reading evidence keeps its sealed bytes.
+            if provenance.get('layer') != 'ocr' and display._native_bitonal() is None:
+                return rect, data, []
+            from .crop_edges import trim_scan_borders
+            data, trims = trim_scan_borders(data)
+            if not trims:
+                return rect, data, []
+            x0,y0,x1,y1 = trims[0]['retained_pixel_bbox']
+            width,height = trims[0]['size']
+            retained = extract.pymupdf.Rect(rect.x0+rect.width*x0/width,
+                rect.y0+rect.height*y0/height, rect.x0+rect.width*x1/width,
+                rect.y0+rect.height*y1/height)
+            return retained, data, trims
         full = "images/original_p%04d.jpg" % pno
         package_source_image(full, display.source_image(scale=1.5, quality=85,
                                                         lossless_candidate=pno not in native_figures))
@@ -2006,11 +2022,18 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
             if key.startswith(('text_', 'caption_', 'furniture_')):
                 reading_rect, edge_proof = display.complete_detail_rect(reading_rect)
                 rect = display.source_rect(reading_rect) * doc[pno].derotation_matrix
-            package_source_image(src, display.source_image(reading_rect,
-                                                            scale=2 if pno in native_figures else 3,
-                                                            lossless_candidate=pno not in native_figures))
+            original_reading_rect = reading_rect
+            reading_rect, data, trims = reading_crop(reading_rect, display.source_image(reading_rect,
+                scale=2 if pno in native_figures else 3,
+                lossless_candidate=pno not in native_figures))
+            package_source_image(src, data)
+            if trims:
+                rect = display.source_rect(reading_rect) * doc[pno].derotation_matrix
             details.append({"id": key, "label": label, "src": src, "bbox": list(rect),
                             "reading_bbox": list(reading_rect)})
+            if trims:
+                details[-1].update(scan_border_trim=trims,
+                    original_reading_bbox=list(original_reading_rect))
             if edge_proof is not None:details[-1]['source_edge_completion'] = edge_proof
         from .source_display import grid_regions
         # These new native routes inspect an already-owned figure region; they
@@ -2022,9 +2045,13 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
             if element_index != proof['element_indices'][0]:continue
             key = "layout_%d" % element_index
             src = "images/original_p%04d_%s.jpg" % (pno, key)
-            package.image(src, display.source_image(proof['reading_bbox'],
-                                                     lossless_candidate=True))
+            rect, data, trims = reading_crop(extract.pymupdf.Rect(proof['reading_bbox']),
+                display.source_image(proof['reading_bbox'], lossless_candidate=True))
+            package.image(src, data)
             details.append({"id": key, "label": "Original layout and labels", "src": src, **proof})
+            if trims:
+                details[-1].update(scan_border_trim=trims, reading_bbox=list(rect),
+                    original_reading_bbox=proof['reading_bbox'])
         if pno in native_figures or provenance.get('layer') == 'ocr' or any(
                 f.get('found') in ('unrecovered_scan_layer','unverified_scan_layout','unverified_paired_columns') and f.get('pno') == pno
                 for f in book.figures):
@@ -2037,10 +2064,13 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
                 _check_cancelled(should_stop)
                 key = "inspection_%d" % tile_index
                 src = "images/original_p%04d_%s.jpg" % (pno, key)
-                package_source_image(src, display.source_image(tile,
-                                                                lossless_candidate=pno not in native_figures))
+                trimmed_tile, data, trims = reading_crop(tile, display.source_image(tile,
+                    lossless_candidate=pno not in native_figures))
+                package_source_image(src, data)
                 details.append({"id": key, "label": "Original detail %d (row order)" % (tile_index + 1),
-                    "src": src, "reading_bbox": list(tile), "displayed_pdf_bbox": list(display.source_rect(tile))})
+                    "src": src, "reading_bbox": list(trimmed_tile), "displayed_pdf_bbox": list(display.source_rect(trimmed_tile))})
+                if trims:
+                    details[-1].update(scan_border_trim=trims, original_reading_bbox=list(tile))
         inspection = [d for d in details if d['id'].startswith('inspection_')]
         for detail in details:
             if detail not in inspection and detail.get('reading_bbox'):
