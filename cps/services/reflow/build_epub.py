@@ -312,7 +312,10 @@ def page_fragment(book, pno, style=None, wrappers=None, element_blocks=None):
                 # complete pixel atom and chooses its role against the raster.
                 image = _figure_html(pno, figure_index, '', source_region=True)
                 image = re.search(r'<img\b[^>]*>', image).group(0)
-                blocks.append('<p><span class="source-raster">' + image + '</span></p>')
+                image = '<p><span class="source-raster">' + image + '</span></p>'
+                if element_index in note_context_figures:
+                    image = '<aside class="source-note-context">' + image + '</aside>'
+                blocks.append(image)
                 blocks.append('<p class="source-evidence-notice">' + caption + '</p>')
             else:
                 image = _figure_html(pno, figure_index, caption, source_region=source_region)
@@ -2360,6 +2363,8 @@ def build(book, out_path, page_html=None, metadata=None, doc=None,
             parenthetical_seams=parenthetical_seams)
         contents_pages = _source_contents_pages(pages, doc)
         chapters = _chapters(pages, book.title_pages, contents_pages)
+        from . import reading_flow
+        reading_flow_audit = reading_flow.finish(chapters, book)
         chapter_images = {src for chapter in chapters for src in _IMG_SRC.findall('\n'.join(chapter.blocks))}
         if not set(required_source_regions) <= chapter_images:
             from .structural_ops import ContractError
@@ -2475,6 +2480,7 @@ def build(book, out_path, page_html=None, metadata=None, doc=None,
             manifest.append({"id": "img%03d" % index, "href": src, "type": package.media_types[src]})
 
         payload = _sidecar(book, pages, chapters, images, joins, sidecar, blanks)
+        payload['reading_flow'] = reading_flow_audit
         if compiled_layouts:
             payload['layout_operations'] = layout_build.report(compiled_layouts)
             bound_notes = payload['layout_operations'].get('note_bindings_applied', 0)

@@ -27,6 +27,7 @@ its evidence, and each is paired with printed text it must leave alone.
 import bisect
 from copy import deepcopy
 import re
+import statistics
 from collections import Counter
 from dataclasses import dataclass, field
 from typing import List, Optional, Tuple
@@ -484,6 +485,52 @@ def source_note_context_figures(book, pno):
         if index+1<len(elements) and elements[index+1].kind=='caption':continue
         box=tuple(element.bbox)
         figures=[f for f in book.figures if f['pno']==pno and tuple(f['bbox'])==box]
+        if len(figures)==1 and figures[0].get('found')=='ocr_uncertain_region':
+            # A damaged scan note can lose its note role before rasterization.
+            # Require a complete image-owned territory, a raised small opening
+            # digit, smaller local type, a detached footer position, and no
+            # following prose in this column. The digit is never transcribed.
+            assets=[a for a in inventory['assets'] if tuple(a['bbox'])==box]
+            ids=set(assets[0]['covered_line_ids']) if len(assets)==1 else set()
+            if len(assets)==1 and not ids:
+                # OCR padding leaves the accounting owner unresolved. Complete
+                # containment in a unique crop can still prove note territory;
+                # it does not authorize the damaged words as live text.
+                for row in inventory['lines']:
+                    line_box=row['source'].bbox
+                    memberships=[r for r in inventory['regions'] if row['id'] in r['line_ids']]
+                    containing=[a for a in inventory['assets'] if
+                        a['bbox'][0]<=line_box[0] and a['bbox'][1]<=line_box[1]
+                        and line_box[2]<=a['bbox'][2] and line_box[3]<=a['bbox'][3]]
+                    if (len(memberships)==1 and memberships[0]['suggested_kind']=='artwork'
+                            and memberships[0]['reason']=='ocr_uncertain_region'
+                            and len(containing)==1 and containing[0] is assets[0]):
+                        ids.add(row['id'])
+            rows=[r['source'] for r in inventory['lines'] if r['id'] in ids]
+            lines=sorted(rows,key=lambda l:(l.bbox[1],l.bbox[0]))
+            local=[r['source'] for r in inventory['lines'] if
+                r['source'].bbox[3]<box[1] and r['source'].bbox[2]>box[0]
+                and r['source'].bbox[0]<box[2] and len(r['source'].stripped.split())>=5]
+            if lines and local:
+                spans=[s for s in lines[0].spans if s.text.strip()]
+                size=statistics.median(s.size for l in lines for s in l.spans
+                    for _ in range(min(200,len(s.text.strip()))))
+                body_size=statistics.median(s.size for l in local[-8:] for s in l.spans
+                    for _ in range(min(200,len(s.text.strip()))))
+                bottom=max(r['source'].bbox[3] for r in inventory['lines'])
+                later=[r for r in inventory['regions'] if r['suggested_kind'] in ('body','list')
+                    and r['bbox'][1]>=box[3] and r['bbox'][0]<box[2] and r['bbox'][2]>box[0]]
+                if (len(spans)>=2 and re.fullmatch(r'[1-9]\d{0,2}|[*†‡]',spans[0].text.strip())
+                        and spans[0].size<=size*.75 and size<=body_size*.85
+                        and box[1]>=bottom*.70 and not later
+                        and box[1]-max(l.bbox[3] for l in local)>=body_size*.75
+                        and all(r['id'] in ids for r in inventory['lines'] if
+                            r['source'].bbox[0]<box[2] and box[0]<r['source'].bbox[2]
+                            and r['source'].bbox[1]<box[3] and box[1]<r['source'].bbox[3])
+                        and all(box[0]<=l.bbox[0] and box[1]<=l.bbox[1]
+                                and l.bbox[2]<=box[2] and l.bbox[3]<=box[3] for l in lines)):
+                    proved.add(index)
+                    continue
         if len(figures)==1 and figures[0].get('found')=='ocr_uncertain_note':
             assets=[a for a in inventory['assets'] if tuple(a['bbox'])==box]
             if len(assets)!=1 or figures[0].get('full_page'):continue

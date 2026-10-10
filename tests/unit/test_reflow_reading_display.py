@@ -189,14 +189,17 @@ def test_existing_owned_soft_hyphen_seam_replays_without_normalizing_raw(tmp_pat
         assert base.html==s.html and '\xad' not in base.html
 
 
-def test_existing_builder_puts_split_span_alternative_after_original(retained):
+def test_existing_builder_puts_split_span_alternative_after_complete_paragraph(retained):
     from cps.services.reflow import source_readings as sr
     b,d,base,r,t=retained
     _,_,_,admitted=evidence(retained,[selected()]);s=sr.attach(b,base,admitted)
     built=build_epub.build(b,str(t/'split-main.epub'),doc=d,source_pages={0:s},raw_pages={0:r})
     with zipfile.ZipFile(built.path) as z:
         html=''.join(z.read(n).decode() for n in z.namelist() if n.startswith('OEBPS/ch') and n.endswith('.xhtml'))
-        assert len(annotations(html.split('<body>',1)[1].split('</body>',1)[0]))==1
+        bodies=''.join(part.split('</body>',1)[0] for part in html.split('<body>')[1:])
+        marked=annotations(bodies)
+        assert len(marked)==1
+        assert marked[0].parentNode.getAttribute('class')=='source-evidence-notice'
         assert 'Original: 2°1; Proposed reading: 25' in html
         assert [n.getAttribute('src') for n in tree(base.html).getElementsByTagName('img')]==[n.getAttribute('src') for n in tree(html.split('<body>',1)[1].split('</body>',1)[0]).getElementsByTagName('img')]
 
