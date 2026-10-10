@@ -30,7 +30,9 @@ def scan_borders(image):
             elif value < .80 and start is not None:
                 runs.append((start, x)); start = None
         for left, right in runs:
-            if right-left < max(4, w*.01) or right-left > w*.18:
+            # Four-pixel separators in enlarged note/table crops are printed
+            # source rules. A detached scan bar must have substantial depth.
+            if right-left < max(8, w*.01) or right-left > w*.18:
                 continue
             while left > 0 and dark[left-1] > .02:
                 left -= 1

@@ -22,6 +22,11 @@ def test_scan_bar_trim_keeps_list_pixels_and_refuses_rules_or_connected_artwork(
     rule = Image.new('RGB', image.size, 'white')
     ImageDraw.Draw(rule).line((710, 0, 710, 361), fill='black', width=2)
     assert not crop_edges.scan_borders(rule)
+    note = Image.new('RGB', (518, 148), 'white')
+    draw = ImageDraw.Draw(note)
+    draw.rectangle((0, 5, 517, 8), fill='black')
+    draw.text((50, 60), '1 However, opinions abound.', fill='black')
+    assert not crop_edges.scan_borders(note)
     filled = Image.new('RGB', image.size, 'black')
     assert not crop_edges.scan_borders(filled)
 
