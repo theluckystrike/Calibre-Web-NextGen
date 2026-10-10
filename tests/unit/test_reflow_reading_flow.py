@@ -24,9 +24,8 @@ def test_disclosures_wait_for_completed_prose_across_raster_and_chapter_boundari
     assert chapters[1].blocks[1].endswith('Punctuation uncertain</p>')
     assert chapters[1].blocks[-2:] == ['<p>24° Sagittarius.</p>',
         '<p class="source-evidence-notice">View original passage</p>']
-    assert chapters[-1].title == 'Notes and source disclosures'
-    assert 'id="fn_3"' in chapters[-1].blocks[1]
-    assert audit['notes_section_blocks'] == 1
+    assert 'id="fn_3"' in chapters[1].blocks[2]
+    assert audit['notes_checked'] == 1
 
 
 def test_inline_generated_annotation_preserves_word_adjacency_and_return_target():

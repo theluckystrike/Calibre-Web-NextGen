@@ -109,12 +109,19 @@ def assert_source_and_notices_preserved(before,after):
 
 
 def assert_opening_notice_placement(roots,heading):
-    blocks=[n for n in roots[0] if n.get('role')!='doc-pagebreak']
-    title,notice=(blocks[0],blocks[1]) if heading else (blocks[1],blocks[0])
+    # Source warnings follow complete prose, including a wrapped quotation.
+    # A heading or unfinished title paragraph cannot authorize their placement.
+    blocks=[n for r in roots for n in r if n.get('role')!='doc-pagebreak']
+    title=next(n for n in blocks if ''.join(n.itertext())=='Learning the sky')
     assert title.tag==X+('h2' if heading else 'p')
-    assert ''.join(title.itertext())=='Learning the sky'
-    assert generated_notice(notice)
-    assert [a.get('href') for a in notice.iter(X+'a')]==['original-p0000.xhtml#notes']
+    notices=[n for n in blocks if generated_notice(n) and
+        [a.get('href') for a in n.iter(X+'a')]==['original-p0000.xhtml#notes']]
+    assert notices
+    for notice in notices:
+        previous=blocks[blocks.index(notice)-1]
+        assert previous.tag in (X+'p',X+'blockquote')
+        assert 'First source sentence.' in ''.join(previous.itertext())
+        assert blocks.index(notice)>blocks.index(title)
 
 
 @pytest.mark.parametrize('damage',['changed_source','dropped_source','reordered_source',

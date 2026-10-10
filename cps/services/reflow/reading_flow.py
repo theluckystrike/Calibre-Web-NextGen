@@ -56,14 +56,14 @@ def projection(node, images):
 
 
 def finish(chapters, book):
-    """Defer disclosures to a completed paragraph; collect all notes at the end.
+    """Defer disclosures and notes to a completed paragraph.
 
     Run after admission and source joins, before link binding. Note IDs and
     source-page destinations survive, so existing links bind across chapters.
     """
-    from .build_epub import Chapter, _is_aside
+    from .build_epub import _is_aside
     images = image_witnesses(book)
-    pending = []; notes = []; moved = 0; complete = False
+    pending = []; moved = 0; complete = False; note_count = 0
     for chapter in chapters:
         kept = []
         for block in chapter.blocks:
@@ -77,7 +77,8 @@ def finish(chapters, book):
                 # them to the note section would break the visible return flow.
                 (kept if complete else pending).append(block); moved += 1; continue
             if _is_aside(block) or 'reflow-retained-furniture' in classes:
-                notes.append(block); moved += 1; continue
+                (kept if complete else pending).append(block)
+                moved += 1; note_count += 1; continue
             if 'source-evidence-notice' in classes:
                 (kept if complete else pending).append(block); moved += 1; continue
             # Alternative-reading annotations are generated copy too. Preserve
@@ -102,17 +103,19 @@ def finish(chapters, book):
                 block = ''.join(ET.tostring(c, encoding='unicode') for c in root)
             kept.append(block)
             tag = node.tag.rsplit('}', 1)[-1]
-            if tag == 'p':
+            if tag in ('p', 'blockquote') and 'caption' not in classes:
                 complete = bool(END.search(projection(node, images).strip()))
                 if complete:
                     kept.extend(pending); pending = []
             elif tag != 'span':
                 complete = False
         chapter.blocks = kept
-    if pending or notes:
-        chapter = Chapter(index=len(chapters)+1, title='Notes and source disclosures',
-                          blocks=['<h1>Notes and source disclosures</h1>']+notes+pending)
-        chapters.append(chapter)
+    if pending and chapters:
+        # A label/index can end without sentence punctuation. Its remaining
+        # notes have an explicit notes section after the complete body lane,
+        # with no invented heading words in the source stream.
+        chapters[-1].blocks.append('<section class="source-notes" epub:type="endnotes" '
+            'aria-label="Notes and source disclosures">'+''.join(pending)+'</section>')
     return dict(version='source-reading-flow-1', moved_blocks=moved,
-                notes_section_blocks=len(notes), trailing_disclosures=len(pending),
+                notes_checked=note_count, trailing_disclosures=len(pending),
                 image_witnesses=images)
