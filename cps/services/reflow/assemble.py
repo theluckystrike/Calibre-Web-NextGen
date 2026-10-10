@@ -491,11 +491,15 @@ def source_note_context_figures(book, pno):
     bottom=max((r['source'].bbox[3] for r in inventory['lines']),default=0)
     known_footer=[f['bbox'] for f in book.figures if f['pno']==pno
         and f.get('found')=='ocr_uncertain_note' and f['bbox'][1]>=bottom*.70]
+    native_footer=[r for r in inventory['regions'] if r['suggested_kind']=='note'
+        and r['bbox'][1]>=bottom*.70]
+    known_footer.extend(r['bbox'] for r in native_footer)
     def bounded_note_territory(box):
         local=[b for b in known_footer if b[0]<box[2] and box[0]<b[2]]
         return (len(local)>=2 and min(b[1] for b in local)<=box[1]
                 and box[3]<=max(b[3] for b in local))
     footer_neighbors=set()
+    footer_neighbors.update(i for r in native_footer for i in r['line_ids'])
     footer_neighbors.update(r['id'] for r in inventory['lines'] if bounded_note_territory(r['source'].bbox))
     for asset in inventory['assets']:
         box=asset['bbox']

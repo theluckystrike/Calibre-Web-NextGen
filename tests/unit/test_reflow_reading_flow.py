@@ -21,10 +21,12 @@ def test_disclosures_wait_for_completed_prose_across_raster_and_chapter_boundari
             '<p>24° Sagittarius.</p>'])]
     audit = reading_flow.finish(chapters, book)
     assert chapters[0].blocks == ['<p>We cannot com-</p>']
-    assert chapters[1].blocks[1].endswith('Punctuation uncertain</p>')
-    assert chapters[1].blocks[-2:] == ['<p>24° Sagittarius.</p>',
-        '<p class="source-evidence-notice">View original passage</p>']
-    assert 'id="fn_3"' in chapters[1].blocks[2]
+    assert chapters[1].blocks[:3] == [
+        '<p><span class="source-raster"><img src="images/fig_p0000_0.jpg"/></span></p>',
+        '<p>trine to Saturn at</p>', '<p>24° Sagittarius.</p>']
+    assert chapters[1].blocks[3].endswith('Punctuation uncertain</p>')
+    assert 'id="fn_3"' in chapters[1].blocks[4]
+    assert chapters[1].blocks[-1] == '<p class="source-evidence-notice">View original passage</p>'
     assert audit['notes_checked'] == 1
 
 
@@ -49,6 +51,37 @@ def test_raster_notes_live_in_notes_section_with_their_targets_and_returns():
     assert 'class="source-notes"' in chapters[0].blocks[-1]
     assert note in chapters[0].blocks[-1]
     assert audit['raster_notes_in_notes_section']==1
+
+
+def test_opaque_prose_ocr_period_does_not_release_notices_inside_printed_sentence():
+    book=assemble.Book()
+    book.figures=[dict(pno=0,bbox=(0,0,200,20),found='ocr_uncertain_region')]
+    book.artwork=[dict(pno=0,bbox=(0,0,200,20),text='Mercury represents the.')]
+    chapter=build_epub.Chapter(1,'',blocks=[
+        '<p><span class="source-raster"><img src="images/fig_p0000_0.jpg"/></span></p>',
+        '<p class="source-evidence-notice">OCR uncertain</p>',
+        '<p>certificates. The complete live paragraph.</p>'])
+    reading_flow.finish([chapter],book)
+    assert chapter.blocks[1]=='<p>certificates. The complete live paragraph.</p>'
+    assert chapter.blocks[2]=='<p class="source-evidence-notice">OCR uncertain</p>'
+
+
+def test_uncertain_footer_crop_can_overlap_neighbouring_live_source_notes():
+    body_box=(48,516,384,539)
+    body=extract.Line([extract.Span('The unfinished running source sentence continues',11,'ocr',0,body_box)],body_box)
+    boxes=[(56,553,288,563),(56,565,288,575),(56,577,288,587)]
+    lines=[extract.Line([extract.Span('3 ',4,'ocr',0,(56,b[1],60,b[1]+4)),
+        extract.Span('Printed source note.',8,'ocr',0,(61,b[1],288,b[3]))],b) for b in boxes]
+    crop=(53,561,292,579)
+    raw=extract.RawPage(0,840,620,[extract.Block(i,l.bbox,[l]) for i,l in enumerate([body]+lines)])
+    regions=[skeleton.Region('body',lines=[body],bbox=body_box),
+        skeleton.Region('note',lines=[lines[0]],bbox=boxes[0]),
+        skeleton.Region('figure',bbox=crop,reason='ocr_uncertain_region'),
+        skeleton.Region('artwork',lines=[lines[1]],bbox=boxes[1],reason='ocr_uncertain_region'),
+        skeleton.Region('note',lines=[lines[2]],bbox=boxes[2])]
+    book=assemble.assemble([skeleton.PageSkeleton(0,840,620,regions=regions)],skeleton.BookStyle(body_size=11),[raw])
+    assert assemble.source_note_context_figures(book,0)=={1}
+    assert book.conservation.ok
 
 
 def test_padded_uncertain_footer_image_is_a_note_without_transcribing_its_digit():

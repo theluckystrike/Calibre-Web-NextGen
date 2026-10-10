@@ -111,7 +111,12 @@ def finish(chapters, book):
             kept.append(block)
             tag = node.tag.rsplit('}', 1)[-1]
             if tag in ('p', 'blockquote') and 'caption' not in classes:
-                complete = bool(END.search(projection(node, images).strip()))
+                # OCR witnesses establish ownership, not the printed sentence
+                # boundary. A crop can contain a terminal OCR full stop while
+                # its visible last line continues into the next crop.
+                opaque_prose = any('source-raster' in e.get('class', '').split()
+                                   for e in node.iter())
+                complete = not opaque_prose and bool(END.search(projection(node, images).strip()))
                 if complete:
                     kept.extend(pending); pending = []
             elif tag != 'span':
