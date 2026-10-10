@@ -84,6 +84,22 @@ def test_uncertain_footer_crop_can_overlap_neighbouring_live_source_notes():
     assert book.conservation.ok
 
 
+def test_generated_caption_disclosures_do_not_interrupt_a_hyphen_join():
+    chapter=build_epub.Chapter(1,'',blocks=[
+        '<p>The sign is called double-</p>',
+        '<figure><img src="images/chart.png"/><figcaption>Printed chart caption. '
+        '<span class="source-reading-annotation">Original table · View larger</span>'
+        '</figcaption></figure>',
+        '<aside class="footnote"><p>Printed note '
+        '<span class="source-reading-annotation">Inspect source</span>continues.</p></aside>',
+        '<p>bodied in the original source.</p>'])
+    reading_flow.finish([chapter],assemble.Book())
+    assert 'Original table' not in chapter.blocks[1]
+    assert chapter.blocks[2]=='<p>bodied in the original source.</p>'
+    assert any('Printed note continues.' in b for b in chapter.blocks[3:])
+    assert any('Original table' in b for b in chapter.blocks[3:])
+
+
 def test_padded_uncertain_footer_image_is_a_note_without_transcribing_its_digit():
     body_box = (48, 516, 384, 539)
     body = extract.Line([extract.Span('the point at which the divine', 11, 'ocr', 0, body_box)], body_box)

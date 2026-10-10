@@ -184,9 +184,9 @@ def _source_caption(pno, key, *, within_figure=False):
     image = ('' if within_figure else
              '<img src="images/original_p%04d_%s.jpg" alt="Original printed caption"/><br/>' % (pno, key))
     placement = 'in the figure above' if within_figure else 'as an image'
-    return ('<span class="reflow-uncertain">%sCaption transcription uncertain; '
+    return ('<span class="reflow-uncertain">%s<span class="source-reading-annotation">Caption transcription uncertain; '
             'the original printed caption is shown %s, without searchable text. '
-            '<a href="original-p%04d.xhtml#%s">Inspect original printed caption</a>.</span>'
+            '<a href="original-p%04d.xhtml#%s">Inspect original printed caption</a>.</span></span>'
             % (image, placement, pno, key))
 
 
@@ -301,6 +301,10 @@ def page_fragment(book, pno, style=None, wrappers=None, element_blocks=None):
                 caption = ('Source image · <a href="source-checks.xhtml">'
                            'OCR uncertain</a> · <a href="original-p%04d.xhtml#page">'
                            'View larger</a>' % pno)
+            if source_region:
+                # Generated figure/table disclosures obey the same paragraph
+                # boundary rule as prose warnings; printed captions stay here.
+                caption = '<span class="source-reading-annotation">'+caption+'</span>'
             if source_caption and source_region:
                 caption = source_caption + ' ' + caption
             figure = figures[figure_index] if figure_index < len(figures) else {}

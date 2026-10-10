@@ -72,6 +72,27 @@ def finish(chapters, book):
                 kept.append(block); continue
             node = root[0]
             classes = node.get('class', '').split()
+            # Alternative-reading annotations are generated copy too. Preserve
+            # their IDs and inspection links, but never insert them in a word.
+            parents = {c: p for p in root.iter() for c in p}
+            changed = False
+            for child in list(root.iter()):
+                if ('source-evidence-notice' in classes or
+                        'source-reading-annotation' not in child.get('class', '').split()):
+                    continue
+                parent = parents[child]; index = list(parent).index(child)
+                tail = child.tail or ''; child.tail = None
+                parent.remove(child)
+                if index:
+                    previous = parent[index-1]; previous.tail = (previous.tail or '')+tail
+                else:
+                    parent.text = (parent.text or '')+tail
+                notice = ET.Element('p', {'class': 'source-evidence-notice'})
+                notice.append(child)
+                pending.append(ET.tostring(notice, encoding='unicode')); moved += 1
+                changed = True
+            if changed:
+                block = ''.join(ET.tostring(c, encoding='unicode') for c in root)
             if node.tag.rsplit('}', 1)[-1] == 'aside' and any(
                     e.tag.rsplit('}', 1)[-1] == 'img' for e in node.iter()):
                 # Uncertain printed notes retain their pixels in the notes
@@ -88,26 +109,6 @@ def finish(chapters, book):
                 moved += 1; note_count += 1; continue
             if 'source-evidence-notice' in classes:
                 (kept if complete else pending).append(block); moved += 1; continue
-            # Alternative-reading annotations are generated copy too. Preserve
-            # their IDs and inspection links, but never insert them in a word.
-            parents = {c: p for p in root.iter() for c in p}
-            changed = False
-            for child in list(root.iter()):
-                if 'source-reading-annotation' not in child.get('class', '').split():
-                    continue
-                parent = parents[child]; index = list(parent).index(child)
-                tail = child.tail or ''; child.tail = None
-                parent.remove(child)
-                if index:
-                    previous = parent[index-1]; previous.tail = (previous.tail or '')+tail
-                else:
-                    parent.text = (parent.text or '')+tail
-                notice = ET.Element('p', {'class': 'source-evidence-notice'})
-                notice.append(child)
-                pending.append(ET.tostring(notice, encoding='unicode')); moved += 1
-                changed = True
-            if changed:
-                block = ''.join(ET.tostring(c, encoding='unicode') for c in root)
             kept.append(block)
             tag = node.tag.rsplit('}', 1)[-1]
             if tag in ('p', 'blockquote') and 'caption' not in classes:
