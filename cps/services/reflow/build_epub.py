@@ -1753,6 +1753,10 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         finally:
             if ink_doc is not render_doc:ink_doc.close()
         if data is not None:
+            from .crop_edges import trim_scan_borders
+            data, trims = trim_scan_borders(data)
+            if trims:
+                figure['scan_border_trim'] = trims
             # Outside the crop's failure handling: a crop the archive cannot take
             # is a failed build, never a figure reported lost from the source.
             package.image(src, _figure_crop_margin(data))
@@ -2481,6 +2485,8 @@ def build(book, out_path, page_html=None, metadata=None, doc=None,
 
         payload = _sidecar(book, pages, chapters, images, joins, sidecar, blanks)
         payload['reading_flow'] = reading_flow_audit
+        payload['scan_border_trims'] = [dict(page=f['pno'], bbox=list(f['bbox']),
+            trims=f['scan_border_trim']) for f in book.figures if f.get('scan_border_trim')]
         if compiled_layouts:
             payload['layout_operations'] = layout_build.report(compiled_layouts)
             bound_notes = payload['layout_operations'].get('note_bindings_applied', 0)
