@@ -34,6 +34,12 @@ def scan_borders(image):
             # source rules. A detached scan bar must have substantial depth.
             if right-left < max(8, w*.01) or right-left > w*.18:
                 continue
+            # A second broad solid region in the interior is source content
+            # (for example a neighboring printed row or table fill), not a
+            # detached margin defect. Refuse trimming this ambiguous carrier.
+            if any(a < w*.75 and b > w*.25 and b-a >= 8
+                   and (a, b) != (left, right) for a, b in runs):
+                continue
             while left > 0 and dark[left-1] > .02:
                 left -= 1
             while right < w and dark[right] > .02:
