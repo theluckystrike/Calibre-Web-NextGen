@@ -575,6 +575,15 @@ class ScanPixelProbe(object):
         """Inspect actual source pixels, including text masked for art detection."""
         return region_has_ink(self._doc, self._pno, rect, mask=())
 
+    def source_ink_bounds(self, rect):
+        """Measure printed context separators without text-box masks.
+
+        Hidden-layer glyph boxes can extend over a real footnote divider. The
+        caller supplies the gap outside those boxes; masking them would erase
+        the very source boundary being inspected.
+        """
+        return ScanPixelProbe(self._doc, self._pno).ink_bounds(rect)
+
     def ink_bounds(self, rect):
         """Conservative PDF-space extent of source artwork in a bounded clip.
 

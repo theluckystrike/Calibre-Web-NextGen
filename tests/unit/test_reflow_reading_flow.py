@@ -18,6 +18,35 @@ def opaque_page_fixture():
     return extract.RawPage(0,420,600,[extract.Block(i,ln.bbox,[ln]) for i,ln in enumerate(rows)])
 
 
+def test_text_masks_cannot_erase_the_printed_footnote_divider():
+    import pymupdf
+    doc=pymupdf.open()
+    page=doc.new_page(width=420,height=600)
+    page.draw_line((60,138),(130,138),width=.5)
+    try:
+        probe=extract.ScanPixelProbe(doc,0,mask=[(60,139,360,160)])
+        assert probe.ink_bounds((50,130,370,145)) is None
+        assert probe.source_ink_bounds((50,130,370,145)) is not None
+        regions=skeleton.opaque_page_regions(opaque_page_fixture(),
+                    skeleton.BookStyle(body_size=11),probe)
+        assert any(r.reason=='ocr_uncertain_note' for r in regions)
+    finally:
+        doc.close()
+
+
+def test_proven_midpage_footnotes_leave_the_unfinished_body_sentence():
+    raw=opaque_page_fixture()
+    class Probe:
+        def ink_bounds(self,box):return None
+        def source_ink_bounds(self,box):return (60,136,130,138)
+    body,notes=skeleton._split_off_notes(raw,skeleton.BookStyle(body_size=11),
+                    skeleton.PageSkeleton(0,420,600),Probe())
+    assert [n.number for n in notes]==[109]
+    assert 'purple-dyeing and' in ' '.join(b.text for b in body)
+    assert 'Original printed footnote' not in ' '.join(b.text for b in body)
+    assert len([ln for b in body for ln in b.lines])+sum(len(n.lines) for n in notes)==5
+
+
 @pytest.mark.parametrize('ink,notes', [((60,136,130,138),True),
                                       (None,False),((60,120,300,143),False)])
 def test_untrusted_page_pixels_separate_only_proven_note_territory(ink,notes):

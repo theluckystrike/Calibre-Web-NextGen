@@ -1184,7 +1184,8 @@ def opaque_page_regions(raw, style, pixel_probe=None):
             # Stay outside the glyph boxes. A short footnote rule need not be
             # wide enough to satisfy the table/grid separator detector.
             try:
-                ink = pixel_probe.ink_bounds((left-em, bottom+.5, right+em, top-.5))
+                bounds = getattr(pixel_probe, 'source_ink_bounds', pixel_probe.ink_bounds)
+                ink = bounds((left-em, bottom+.5, right+em, top-.5))
             except (AttributeError, ValueError, RuntimeError):
                 continue
             if (ink and ink[3]-ink[1] <= em*.3
@@ -2105,6 +2106,25 @@ def _split_off_notes(raw, style, skel, pixel_probe=None):
     carry their own evidence and do not ask for the corroboration.
     """
     from . import note_evidence
+    # A short body page can leave most of its printed area to footnotes. The
+    # isolated divider and smaller raised opening prove that territory even
+    # when its first note is above the fixed lower-page percentage.
+    if pixel_probe is not None:
+        contexts = opaque_page_regions(raw, style, pixel_probe)
+        note_lines = {id(ln) for region in contexts
+                      if region.kind == 'artwork' and region.reason == 'ocr_uncertain_note'
+                      for ln in region.lines if not _furniture_reason(ln, raw, style)}
+        if note_lines:
+            body, notes = [], []
+            for block in sorted(raw.text_blocks, key=lambda b: (b.bbox[1], b.bbox[0])):
+                kept = [ln for ln in block.lines if id(ln) not in note_lines]
+                owned = [ln for ln in block.lines if id(ln) in note_lines]
+                if kept:
+                    body.append(extract.Block(block.number, _lines_bbox(kept, block.bbox), kept))
+                if owned:
+                    notes.extend(_notes_in_block(extract.Block(
+                        block.number, _lines_bbox(owned, block.bbox), owned), notes))
+            return body, notes
     pixel_note = note_evidence.pixel_separated_note(raw,style.body_size,pixel_probe)
     if pixel_note is not None:
         body,block,number,separator = pixel_note
