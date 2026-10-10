@@ -228,7 +228,7 @@ class Book(object):
 
     def needs_source_evidence(self, pno):
         return any(link['pno'] == pno and link['kind'] == 1 and link['status'] != 'resolved'
-                   for link in self.source_navigation) or any(f["pno"] == pno and f.get("found") in ("ocr_uncertain_note", "source_scan_grid", "source_visual_table", "ocr_uncertain_region", "native_outline_conflict", "native_spacing_uncertain", "unverified_scan_layout", "unrecovered_scan_layer", "unverified_paired_columns", "embedded_source_mark", "source_figure_title", "uncertain_aligned_scan_list", "sparse_scan_spread_panel", "uncertain_scan_key_panel") for f in self.figures) or any(n.pno == pno and n.uses_source_image for n in self.notes) or bool(self.ambiguous_note_numbers(pno)) or any(
+                   for link in self.source_navigation) or any(f["pno"] == pno and f.get("found") in ("source_furniture_context", "ocr_uncertain_note", "source_scan_grid", "source_visual_table", "ocr_uncertain_region", "native_outline_conflict", "native_spacing_uncertain", "unverified_scan_layout", "unrecovered_scan_layer", "unverified_paired_columns", "embedded_source_mark", "source_figure_title", "uncertain_aligned_scan_list", "sparse_scan_spread_panel", "uncertain_scan_key_panel") for f in self.figures) or any(n.pno == pno and n.uses_source_image for n in self.notes) or bool(self.ambiguous_note_numbers(pno)) or any(
             any(r[0]=="glyph" for r in element.runs) or element.caption_uncertain or element.punctuation_uncertain or bool(getattr(element,"display_group",{}))
             for element in self.pages.get(pno, []))
 
@@ -513,6 +513,10 @@ def source_note_context_figures(book, pno):
         if element.kind!='fig' or not element.bbox:continue
         if index+1<len(elements) and elements[index+1].kind=='caption':continue
         box=tuple(element.bbox)
+        if any(f['pno']==pno and tuple(f['bbox'])==box
+               and f.get('found')=='source_furniture_context' for f in book.figures):
+            proved.add(index)
+            continue
         figures=[f for f in book.figures if f['pno']==pno and tuple(f['bbox'])==box]
         if len(figures)==1 and figures[0].get('found')=='ocr_uncertain_region':
             # A damaged scan note can lose its note role before rasterization.

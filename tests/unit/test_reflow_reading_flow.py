@@ -6,6 +6,42 @@ from cps.services.reflow import assemble, build_epub, reading_flow, extract, ske
 pytestmark = pytest.mark.unit
 
 
+def opaque_page_fixture():
+    def line(text, size, box):
+        return extract.Line([extract.Span(text,size,'Times',0,box)],box)
+    rows=[line('RUNNING HEADER',9,(80,25,230,35)),
+          line('The source sentence is not yet complete and',11,(60,70,360,82)),
+          line('the next page continues it after purple-dyeing and',11,(60,86,360,98))]
+    note=extract.Line([extract.Span('109',5,'Times',0,(64,148,74,154)),
+                      extract.Span(' Original printed footnote.',9,'Times',0,(78,149,360,160))],(64,148,360,160))
+    rows += [note,line('The footnote continues below its printed divider.',9,(60,164,360,175))]
+    return extract.RawPage(0,420,600,[extract.Block(i,ln.bbox,[ln]) for i,ln in enumerate(rows)])
+
+
+@pytest.mark.parametrize('ink,notes', [((60,136,130,138),True),
+                                      (None,False),((60,120,300,143),False)])
+def test_untrusted_page_pixels_separate_only_proven_note_territory(ink,notes):
+    raw=opaque_page_fixture()
+    class Probe:
+        def ink_bounds(self,box):return ink
+    regions=skeleton.opaque_page_regions(raw,skeleton.BookStyle(body_size=11),Probe())
+    figures=[r for r in regions if r.kind=='figure']
+    assert any(r.reason=='ocr_uncertain_note' for r in figures)==notes
+    # Crops cover every source pixel once; no OCR word or note digit is adopted.
+    assert figures[0].bbox[1]==0 and figures[-1].bbox[3]==raw.height
+    assert all(a.bbox[3]==b.bbox[1] for a,b in zip(figures,figures[1:]))
+    owned=[ln for r in regions if r.kind=='artwork' for ln in r.lines]
+    assert sorted(map(id,owned))==sorted(id(ln) for b in raw.blocks for ln in b.lines)
+    book=assemble.assemble([skeleton.PageSkeleton(0,raw.width,raw.height,regions=regions)],
+                          skeleton.BookStyle(body_size=11),[raw])
+    blocks=build_epub.split_blocks(build_epub.page_fragment(book,0))
+    chapter=build_epub.Chapter(1,'',blocks=blocks+['<p>perfume making finishes the sentence.</p>'])
+    reading_flow.finish([chapter],book)
+    assert 'source-notes' in chapter.blocks[-1]
+    assert not any('<aside' in block for block in chapter.blocks[:-1])
+    assert book.conservation.ok
+
+
 def test_disclosures_wait_for_completed_prose_across_raster_and_chapter_boundaries():
     book = assemble.Book()
     book.figures = [dict(pno=0, bbox=(0, 0, 200, 20), found='ocr_uncertain_region')]

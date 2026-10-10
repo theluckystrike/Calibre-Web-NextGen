@@ -1145,6 +1145,82 @@ def _complete_captioned_scan_top(raw, skel, pixel_probe):
             figure.bbox = (x0,max(top,ink[1]-2),x1,y1)
 
 
+def opaque_page_regions(raw, style, pixel_probe=None):
+    """Separate proven page furniture/notes without trusting their words.
+
+    A rejected hidden transcript still supplies source geometry. A detached,
+    smaller raised opening below larger prose, with a painted note divider,
+    proves a note territory without establishing any numeral or transcription.
+    The horizontal strips partition the original page pixels completely.
+    """
+    from statistics import median
+    lines = sorted([ln for b in raw.text_blocks for ln in b.lines],
+                   key=lambda ln: (ln.bbox[1], ln.bbox[0]))
+    def size(rows):
+        values = [s.size for ln in rows for s in ln.spans
+                  for _ in range(min(200, len(s.text.strip()))) if s.size > 0]
+        return median(values) if values else 0
+    furniture = [ln for ln in lines if _furniture_reason(ln, raw, style)]
+    prose = [ln for ln in lines if ln not in furniture]
+    notes = []; cut = raw.height
+    if pixel_probe is not None:
+        candidates = []
+        for i, opening in enumerate(prose):
+            above, below = prose[:i], prose[i:]
+            spans = [s for s in opening.spans if s.text.strip()]
+            em, small = size(above), size(below)
+            if (len(above) < 2 or len(spans) < 2 or not em or not small
+                    or not re.fullmatch(r"[1-9]\d{0,2}|[*†‡'’]", spans[0].text.strip())
+                    or spans[0].size > small*.75 or small > em*.9
+                    or any(size([ln]) > em*.95 for ln in below)):
+                continue
+            bottom = max(ln.bbox[3] for ln in above)
+            top = min(ln.bbox[1] for ln in below)
+            left = min(ln.bbox[0] for ln in above)
+            right = max(ln.bbox[2] for ln in above)
+            if (top-bottom < em*1.5 or right-left < em*12
+                    or any(ln.bbox[0] < left-em or ln.bbox[2] > right+em for ln in below)):
+                continue
+            # Stay outside the glyph boxes. A short footnote rule need not be
+            # wide enough to satisfy the table/grid separator detector.
+            try:
+                ink = pixel_probe.ink_bounds((left-em, bottom+.5, right+em, top-.5))
+            except (AttributeError, ValueError, RuntimeError):
+                continue
+            if (ink and ink[3]-ink[1] <= em*.3
+                    and (right-left)*.18 <= ink[2]-ink[0] <= (right-left)*.8
+                    and abs(ink[0]-left) <= em
+                    and ink[1]-bottom >= em*.5 and top-ink[3] >= .5):
+                candidates.append((above, below, (bottom+ink[1])/2))
+        if len(candidates) == 1:
+            prose, notes, cut = candidates[0]
+    if not prose:
+        return [Region('artwork', lines=lines, bbox=(0,0,raw.width,raw.height),
+                       reason='unrecovered_scan_layer'),
+                Region('figure', bbox=(0,0,raw.width,raw.height), reason='unrecovered_scan_layer')]
+    first = min(ln.bbox[1] for ln in prose)
+    last = max(ln.bbox[3] for ln in prose)
+    top_furniture = [ln for ln in furniture if ln.bbox[3] < first]
+    bottom_furniture = [ln for ln in furniture if ln.bbox[1] > last and ln not in notes]
+    start = (max(ln.bbox[3] for ln in top_furniture)+first)/2 if top_furniture else 0
+    end = cut if notes else ((last+min(ln.bbox[1] for ln in bottom_furniture))/2
+                            if bottom_furniture else raw.height)
+    # Furniture whose geometry overlaps body cannot be separated safely.
+    if any(ln not in top_furniture+bottom_furniture for ln in furniture):
+        start = 0; end = cut; prose = [ln for ln in lines if ln not in notes]
+    strips = []
+    if start: strips.append((0,start,top_furniture,'source_furniture_context'))
+    strips.append((start,end,prose,'unrecovered_scan_layer'))
+    if notes: strips.append((end,raw.height,notes+bottom_furniture,'ocr_uncertain_note'))
+    elif end < raw.height: strips.append((end,raw.height,bottom_furniture,'source_furniture_context'))
+    regions = []
+    for y0,y1,owned,reason in strips:
+        box = (0,y0,raw.width,y1)
+        regions.extend([Region('artwork', lines=owned, bbox=box, reason=reason),
+                        Region('figure', bbox=box, reason=reason)])
+    return regions
+
+
 def page_skeleton(raw, style, layer_trusted=True, pixel_probe=None, visual_objects=None):
     """Classify one page's regions, recording a reason for every uncertain call.
 
@@ -1162,11 +1238,7 @@ def page_skeleton(raw, style, layer_trusted=True, pixel_probe=None, visual_objec
         if needs_recovery(raw) or getattr(raw, "transcript_unverified", False):
             # Recognition was disabled or could not establish a source layer.
             # Preserve the complete page, not an invisible garbage transcript.
-            skel.regions.append(Region(kind='artwork',
-                lines=[ln for b in raw.text_blocks for ln in b.lines],
-                bbox=(0,0,raw.width,raw.height),reason='unrecovered_scan_layer'))
-            skel.regions.append(Region(kind='figure',bbox=(0,0,raw.width,raw.height),
-                reason='unrecovered_scan_layer'))
+            skel.regions.extend(opaque_page_regions(raw, style, pixel_probe))
             return skel
 
     unverified_columns = _unverified_column_region(raw)
