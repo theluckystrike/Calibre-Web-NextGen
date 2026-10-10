@@ -95,3 +95,24 @@ def test_adjacent_uncertain_footer_notes_allow_padding_overlap_and_damaged_raise
     book=assemble.assemble([skeleton.PageSkeleton(0,840,600,regions=regions)],skeleton.BookStyle(body_size=11),[raw])
     assert assemble.source_note_context_figures(book,0)=={1,2}
     assert book.conservation.ok and not book.notes
+
+
+def test_known_footer_notes_bound_damaged_intervening_note_without_adopting_its_marker():
+    body_box=(48,516,384,539)
+    body=extract.Line([extract.Span('The unfinished source sentence continues',11,'ocr',0,body_box)],body_box)
+    boxes=[(56,552,288,561),(56,568,288,578),(56,600,288,609)]
+    texts=[('9 ',4,'Known opening note.'),(', ',17,'Damaged intervening printed note.'),('17 ',4,'Known closing note.')]
+    lines=[extract.Line([extract.Span(mark,size,'ocr',0,box),extract.Span(text,8,'ocr',0,box)],box)
+        for box,(mark,size,text) in zip(boxes,texts)]
+    raw=extract.RawPage(0,840,620,[extract.Block(i,l.bbox,[l]) for i,l in enumerate([body]+lines)])
+    regions=[skeleton.Region('body',lines=[body],bbox=body_box)]
+    for i,line in enumerate(lines):
+        reason='ocr_uncertain_region' if i==1 else 'ocr_uncertain_note'
+        regions.extend([skeleton.Region('figure',bbox=line.bbox,reason=reason),
+            skeleton.Region('artwork',lines=[line],bbox=line.bbox,reason=reason)])
+    book=assemble.assemble([skeleton.PageSkeleton(0,840,620,regions=regions)],skeleton.BookStyle(body_size=11),[raw])
+    assert assemble.source_note_context_figures(book,0)=={1,2,3}
+    assert book.conservation.ok and not book.notes
+    # One known note does not prove a bounded cluster for the damaged marker.
+    book.figures[-1]['found']='ocr_uncertain_region'
+    assert 2 not in assemble.source_note_context_figures(book,0)
