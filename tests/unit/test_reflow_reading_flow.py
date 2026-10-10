@@ -41,6 +41,16 @@ def test_inline_generated_annotation_preserves_word_adjacency_and_return_target(
     assert root[1].find('span/a').get('href') == 'original-p0000.xhtml'
 
 
+def test_raster_notes_live_in_notes_section_with_their_targets_and_returns():
+    note='<aside class="footnote" id="fn_p0355_10"><p>10 <img src="images/note.jpg"/></p><a href="ch001.xhtml#reference">Return</a></aside>'
+    chapters=[build_epub.Chapter(1,'',blocks=['<p id="reference">The complete source paragraph.</p>',note,'<p>Next source paragraph.</p>'])]
+    audit=reading_flow.finish(chapters,assemble.Book())
+    assert chapters[0].blocks[:2]==['<p id="reference">The complete source paragraph.</p>','<p>Next source paragraph.</p>']
+    assert 'class="source-notes"' in chapters[0].blocks[-1]
+    assert note in chapters[0].blocks[-1]
+    assert audit['raster_notes_in_notes_section']==1
+
+
 def test_padded_uncertain_footer_image_is_a_note_without_transcribing_its_digit():
     body_box = (48, 516, 384, 539)
     body = extract.Line([extract.Span('the point at which the divine', 11, 'ocr', 0, body_box)], body_box)

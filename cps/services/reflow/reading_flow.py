@@ -63,7 +63,7 @@ def finish(chapters, book):
     """
     from .build_epub import _is_aside
     images = image_witnesses(book)
-    pending = []; moved = 0; complete = False; note_count = 0
+    pending = []; raster_notes = []; moved = 0; complete = False; note_count = 0
     for chapter in chapters:
         kept = []
         for block in chapter.blocks:
@@ -72,6 +72,13 @@ def finish(chapters, book):
                 kept.append(block); continue
             node = root[0]
             classes = node.get('class', '').split()
+            if node.tag.rsplit('}', 1)[-1] == 'aside' and any(
+                    e.tag.rsplit('}', 1)[-1] == 'img' for e in node.iter()):
+                # Uncertain printed notes retain their pixels in the notes
+                # section, never as rasters in the main reading flow. IDs and
+                # embedded Return actions remain available to link binding.
+                raster_notes.append(block); moved += 1; note_count += 1
+                continue
             if 'source-native-returns' in classes:
                 # Destination actions stay near their complete passage. Moving
                 # them to the note section would break the visible return flow.
@@ -110,12 +117,13 @@ def finish(chapters, book):
             elif tag != 'span':
                 complete = False
         chapter.blocks = kept
-    if pending and chapters:
+    if (pending or raster_notes) and chapters:
         # A label/index can end without sentence punctuation. Its remaining
         # notes have an explicit notes section after the complete body lane,
         # with no invented heading words in the source stream.
         chapters[-1].blocks.append('<section class="source-notes" epub:type="endnotes" '
-            'aria-label="Notes and source disclosures">'+''.join(pending)+'</section>')
+            'aria-label="Notes and source disclosures">'+''.join(raster_notes+pending)+'</section>')
     return dict(version='source-reading-flow-1', moved_blocks=moved,
                 notes_checked=note_count, trailing_disclosures=len(pending),
+                raster_notes_in_notes_section=len(raster_notes),
                 image_witnesses=images)
