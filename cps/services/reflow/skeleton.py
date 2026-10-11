@@ -2164,6 +2164,28 @@ def _scan_note_words(lines):
             if any(c.isalpha() for c in sp.text)]
 
 
+def _corroborated_raised_scan_note_openings(block, small):
+    """A later aligned raised digit corroborates a damaged opening's territory.
+
+    This proves ownership only. Neither the damaged opening nor the later OCR
+    digit is adopted as the note's number.
+    """
+    if not _raised_scan_note_opening(block, small):
+        return False
+    first = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    for line in block.lines[1:]:
+        later = [sp for sp in line.spans if sp.text.strip()]
+        if (len(later) < 2 or not later[0].text.strip().isdecimal()
+                or line.bbox[1] <= block.lines[0].bbox[1]):
+            continue
+        row = extract.Block(block.number, line.bbox, [line])
+        if (_raised_scan_note_opening(row, small, allow_numeric=True)
+                and abs(later[0].bbox[0]-first[0].bbox[0]) <= small*.25
+                and abs(later[1].bbox[0]-first[1].bbox[0]) <= small*.25):
+            return True
+    return False
+
+
 def _scan_note_small_block(raw, block, style):
     """Measure OCR words, rather than an outlying line-size scalar."""
     alpha = _scan_note_words(block.lines)
@@ -2178,7 +2200,10 @@ def _scan_note_small_block(raw, block, style):
         return None
     small = median(sp.size for sp in alpha)
     height = median(sp.bbox[3]-sp.bbox[1] for sp in alpha)
-    if small > style.body_size*.86 or height > style.body_size*.65:
+    if (height > style.body_size*.65
+            or (small > style.body_size*.86
+                and not (small <= style.body_size*.90
+                         and _corroborated_raised_scan_note_openings(block, small)))):
         return None
     return small, height
 

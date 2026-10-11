@@ -160,3 +160,50 @@ def test_note_reclamation_preserves_full_page_anchor_checks_for_chart_degrees():
     assert not any(label in n.lines for n in notes)
     assert asdict(raw)==before
     assert sum(len(l.spans) for b in body for l in b.lines)+sum(len(l.spans) for n in notes for l in n.lines)==sum(len(l.spans) for b in raw.blocks for l in b.lines)
+
+
+def corroborated_footer():
+    data=json.loads((Path(__file__).parents[1]/'fixtures/reflow/corroborated_scan_footer.json').read_text())
+    d=data['raw'];blocks=[]
+    for b in d.pop('blocks'):
+        lines=[extract.Line([extract.Span(**dict(s,bbox=tuple(s['bbox']))) for s in l['spans']],tuple(l['bbox']),spacing_uncertain=l.get('spacing_uncertain',False),transcription_uncertain=l.get('transcription_uncertain',False)) for l in b['lines']]
+        blocks.append(extract.Block(b['number'],tuple(b['bbox']),lines,kind=b['kind']))
+    images=[extract.Image(**dict(i,bbox=tuple(i['bbox']))) for i in d.pop('images')]
+    raw=extract.RawPage(**dict(d,blocks=blocks,images=images))
+    values=data['style']
+    for key in ['folio_boxes','local_running_boxes','repeated_head_boxes','portrait_head_boxes','scan_spread_head_boxes','scan_table_label_boxes','scan_note_lane_boxes']:
+        values[key]={int(p):[tuple(box) for box in boxes] for p,boxes in values[key].items()}
+    return raw,skeleton.BookStyle(**values),next(b for b in blocks if b.number==5).lines
+
+
+def test_later_aligned_raised_numeric_opening_corroborates_damaged_bibliography_footer():
+    raw,style,targets=corroborated_footer()
+    assert targets[0].spans[0].text=='> ' and targets[1].spans[0].text=='4 '
+    assert_owned_and_conserved(raw,targets,style)
+
+
+@pytest.mark.parametrize('boundary',['no_later_marker','nonnumeric_later','baseline_later','large_later','misaligned_marker','misaligned_text','reliable_first','alphabetic_first','body_type','attached','caption','table'])
+def test_corroboration_does_not_relax_generic_small_type_footer_ownership(boundary):
+    raw,style,targets=corroborated_footer();first=targets[0].spans[0];later=targets[1].spans[0]
+    if boundary=='no_later_marker': targets[1].spans.remove(later)
+    elif boundary=='nonnumeric_later': later.text='? '
+    elif boundary=='baseline_later': later.bbox=tuple(v+5 if i in (1,3) else v for i,v in enumerate(later.bbox));later.origin_y+=5
+    elif boundary=='large_later': later.size=11
+    elif boundary=='misaligned_marker': later.bbox=tuple(v+8 if i in (0,2) else v for i,v in enumerate(later.bbox))
+    elif boundary=='misaligned_text': targets[1].spans[1].bbox=tuple(v+8 if i in (0,2) else v for i,v in enumerate(targets[1].spans[1].bbox))
+    elif boundary=='reliable_first': first.uncertain=False
+    elif boundary=='alphabetic_first': first.text='a '
+    elif boundary=='body_type':
+        for l in targets:
+            for s in l.spans[1:]: s.size=11
+    elif boundary=='attached':
+        for l in targets:
+            l.bbox=tuple(v-14 if i in (1,3) else v for i,v in enumerate(l.bbox))
+            for s in l.spans: s.bbox=tuple(v-14 if i in (1,3) else v for i,v in enumerate(s.bbox));s.origin_y-=14
+        b=next(b for b in raw.blocks if b.number==5);b.bbox=(b.bbox[0],b.bbox[1]-14,b.bbox[2],b.bbox[3]-14)
+    elif boundary=='caption': first.text='Chart 3 '
+    elif boundary=='table': style.scan_table_label_boxes={raw.pno:[targets[0].bbox]}
+    before=asdict(raw);body,notes=split(raw,style)
+    assert not any(l in n.lines for n in notes for l in targets)
+    assert all(any(l in b.lines for b in body) for l in targets)
+    assert asdict(raw)==before
