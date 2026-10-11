@@ -559,7 +559,8 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
         if any(len(panel) < 4 for panel in panels):
             continue
         gutter = (max(line.bbox[2] for line in panels[0]), min(line.bbox[0] for line in panels[1]))
-        if gutter[1]-gutter[0] < raw.width*GUTTER_MIN or any(
+        if gutter[1]-gutter[0] < min(raw.width*GUTTER_MIN,
+                2*median(line.bbox[3]-line.bbox[1] for line in wide)) or any(
                 line.bbox[0] < gutter[0] and line.bbox[2] > gutter[1] for line in lines):
             continue
         for side, panel in enumerate(panels):
@@ -612,7 +613,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
                     or first.bbox[3] > raw.height*(.12 if folio is not None else .08)
                     or first.bbox[3]-first.bbox[1] > height*(1.25 if folio is not None else .75)
                     or first.bbox[2]-first.bbox[0] > raw.width*.32 or not remaining
-                    or min(line.bbox[1] for line in remaining)-first.bbox[3] < height*.65
+                    or min(line.bbox[1] for line in remaining)-first.bbox[3] < height*.5
                     or min(alignments) > raw.width*.03):
                 continue
             candidates.append((raw, first, side, letters, keyed,
@@ -2522,6 +2523,60 @@ def _note_number(line, block_size, opening=False, after=None, following=None):
 _PROSE_SENTENCE = re.compile(r"[A-Z\u201c\u2018\"']\S*[.!?](?:\s|$)")
 
 
+def _damaged_scan_running_head(line, raw, style):
+    """Prove a damaged small-cap margin row without reading its folio.
+
+    Reliable lowercase still means prose. Only explicitly disputed fragments
+    may supply the few lowercase letters in a small, detached running title.
+    A scanner may merge both heads into one line: keep that original line whole
+    only when its span boxes prove two separate outer-margin title groups.
+    """
+    em = style.body_size
+    box = line.bbox
+    if (not raw.is_page_scan or raw.width < raw.height*1.2 or not em
+            or box[1] < 0 or box[3] > raw.height*HEADER_BAND
+            or box[3]-box[1] > em*.9 or _is_caps(line.stripped)
+            or CAPTION_LINE.match(line.stripped) or '°' in line.stripped):
+        return False
+    spans = [sp for sp in line.spans if sp.text.strip()]
+    middle = raw.width*.5
+    if not spans or any(sp.bbox[0] < middle < sp.bbox[2] for sp in spans):
+        return False
+    groups = [[sp for sp in spans if (sp.bbox[0]+sp.bbox[2])/2 < middle],
+              [sp for sp in spans if (sp.bbox[0]+sp.bbox[2])/2 >= middle]]
+    if all(groups) and min(sp.bbox[0] for sp in groups[1])-max(
+            sp.bbox[2] for sp in groups[0]) < 2*em:
+        return False
+    others = [other for block in raw.text_blocks for other in block.lines
+              if other is not line and other.stripped]
+    for side, group in enumerate(groups):
+        if not group:
+            continue
+        text = ''.join(sp.text for sp in group)
+        letters = [c for c in text if c.isalpha()]
+        words = re.findall(r'[A-Za-z]+', text)
+        sizes = [sp.size for sp in group for c in sp.text if c.isalpha()]
+        if (len(letters) < 8 or sum(word.isupper() for word in words) < 2
+                or sum(c.islower() for c in letters) > len(letters)*.3
+                or not sizes or median(sizes) > em*.75
+                or any(any(c.islower() for c in sp.text) and not (
+                    sp.uncertain or
+                    sp.transcription_uncertain or sp.encoding_unresolved)
+                    for sp in group)):
+            return False
+        x0, x1 = min(sp.bbox[0] for sp in group), max(sp.bbox[2] for sp in group)
+        if (x1-x0 > raw.width*.32 or
+                (x0 > raw.width*.12 if side == 0 else x1 < raw.width*.88)):
+            return False
+        neighbors = [other for other in others
+                     if other.bbox[0] < x1 and x0 < other.bbox[2]]
+        if (not neighbors or any(other.bbox[1] < box[3] for other in neighbors)
+                or min(other.bbox[1] for other in neighbors)-box[3] <
+                   (box[3]-box[1])*.75):
+            return False
+    return True
+
+
 def _furniture_reason(line, raw, style, top_y=None):
     if line.bbox in getattr(style, 'scan_spread_head_boxes', {}).get(raw.pno, ()):
         return 'repeated_scan_spread_head'
@@ -2535,6 +2590,8 @@ def _furniture_reason(line, raw, style, top_y=None):
         return "local_running_folio"
     if line.bbox in getattr(style, 'repeated_head_boxes', {}).get(raw.pno, ()):
         return 'repeated_detached_head'
+    if _damaged_scan_running_head(line, raw, style):
+        return 'damaged_scan_running_head'
     # A disputed isolated digit can be a raised body marker, even in the
     # margin band. Its spelling alone does not establish a folio. Measured
     # sequence/repetition ownership above still proves damaged furniture.
