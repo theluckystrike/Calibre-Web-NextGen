@@ -254,6 +254,7 @@ class BookStyle(object):
     portrait_head_boxes: dict = field(default_factory=dict)
     scan_spread_head_boxes: dict = field(default_factory=dict)
     scan_table_label_boxes: dict = field(default_factory=dict)
+    scan_note_lane_boxes: dict = field(default_factory=dict)
 
     @property
     def boiler_threshold(self):
@@ -758,7 +759,8 @@ def book_style(raw_pages, outline=None):
                      local_running_boxes=_local_running_folios(raw_pages,body_size),
                      repeated_head_boxes=_repeated_detached_heads(raw_pages,body_size),
                      portrait_head_boxes=portrait_head_boxes(raw_pages,body_size),
-                     scan_spread_head_boxes=spread_heads, scan_table_label_boxes=table_labels)
+                     scan_spread_head_boxes=spread_heads, scan_table_label_boxes=table_labels,
+                     scan_note_lane_boxes=_repeated_scan_note_lanes(raw_pages,body_size,table_labels))
 
 
 # ------------------------------------------------------------------ heading vetoes
@@ -2157,7 +2159,192 @@ def _attach_disputed_scan_markers(raw, skel):
         skel.regions.remove(art);skel.regions.remove(carrier)
 
 
-def _split_off_notes(raw, style, skel, pixel_probe=None):
+def _scan_note_words(lines):
+    return [sp for line in lines for sp in line.spans
+            if any(c.isalpha() for c in sp.text)]
+
+
+def _scan_note_small_block(raw, block, style):
+    """Measure OCR words, rather than an outlying line-size scalar."""
+    alpha = _scan_note_words(block.lines)
+    if (not alpha or not block.lines
+            or any(sp.font != 'ocr' for line in block.lines for sp in line.spans)
+            or any(CAPTION_LINE.match(line.stripped) or
+                   _squashed_caption(line.stripped) for line in block.lines)
+            or any(box[0] <= line.bbox[0] and box[1] <= line.bbox[1]
+                   and box[2] >= line.bbox[2] and box[3] >= line.bbox[3]
+                   for line in block.lines
+                   for box in style.scan_table_label_boxes.get(raw.pno, []))):
+        return None
+    small = median(sp.size for sp in alpha)
+    height = median(sp.bbox[3]-sp.bbox[1] for sp in alpha)
+    if small > style.body_size*.86 or height > style.body_size*.65:
+        return None
+    return small, height
+
+
+def _scan_note_candidates(raw, style):
+    em = style.body_size
+    if (not em or not raw.is_page_scan
+            or raw.source_geometry.get('space') != 'reading'):
+        return []
+    candidates = []
+    for block in raw.text_blocks:
+        measured = _scan_note_small_block(raw, block, style)
+        if not measured or block.bbox[1] < raw.height*.65:
+            continue
+        small, height = measured
+        above = [line for other in raw.text_blocks if other is not block
+                 for line in other.lines
+                 if line.bbox[3] <= block.bbox[1]
+                 and line.bbox[0] < block.bbox[2] and block.bbox[0] < line.bbox[2]
+                 and line.bbox[2]-line.bbox[0] >= em*12
+                 and (alpha := _scan_note_words([line]))
+                 and median(sp.size for sp in alpha) >= em*.95]
+        if len(above) < 2:
+            continue
+        prior = max(above, key=lambda line: line.bbox[3])
+        larger = _scan_note_words([prior])
+        if (small > median(sp.size for sp in larger)*.9
+                or height > median(sp.bbox[3]-sp.bbox[1] for sp in larger)*.9
+                or block.bbox[1]-prior.bbox[3] < em*.8-.01
+                or block.bbox[0] < prior.bbox[0]-em
+                or block.bbox[2] > prior.bbox[2]+em):
+            continue
+        # A later ordinary paragraph defeats terminal-footer evidence. Font
+        # medians over words do not let a lone inflated OCR word hide a note.
+        if any(other.bbox[1] >= block.bbox[1]
+               and other.bbox[0] < block.bbox[2] and block.bbox[0] < other.bbox[2]
+               and (alpha := _scan_note_words(other.lines))
+               and median(sp.size for sp in alpha) >= em*.95
+               and any(not _furniture_reason(line, raw, style) for line in other.lines)
+               for other in raw.text_blocks if other is not block):
+            continue
+        candidates.append((block, prior, small, height))
+    return candidates
+
+
+def _raised_scan_note_opening(block, small, allow_numeric=False):
+    spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    if len(spans) < 2:
+        return False
+    first, following = spans[:2]
+    marker = first.text.strip()
+    uncertain_mark = (not any(c.isalnum() for c in marker) and '°' not in marker
+                      and (first.uncertain or first.transcription_uncertain
+                           or first.encoding_unresolved))
+    return (1 <= len(marker) <= 3
+            and (uncertain_mark or (allow_numeric and marker.isdecimal()))
+            and first.size <= small*.75 and following.text.lstrip()[:1].isalpha()
+            and first.bbox[1] <= following.bbox[1]+small*.2
+            and first.bbox[3] <= following.bbox[3]-small*.2)
+
+
+def _repeated_scan_note_lanes(raw_pages, body_size, table_labels):
+    """Match unmarked footers to three other independently marked source pages.
+
+    Matching measures type, physical column, hanging indent and footer height.
+    An unmarked candidate never trains its own lane, and duplicate pages count
+    once. Literal OCR and source pixels are not corrected by this proof.
+    """
+    style = BookStyle(body_size=body_size, scan_table_label_boxes=table_labels)
+    candidates, teachers = [], []
+    for raw in raw_pages:
+        for block, prior, small, height in _scan_note_candidates(raw, style):
+            alpha = _scan_note_words([block.lines[0]])
+            if not alpha:
+                continue
+            side = (int((prior.bbox[0]+prior.bbox[2])/2 > raw.width/2)
+                    if raw.width > raw.height*1.2 else 0)
+            feature = (raw, block, prior, small, height, side,
+                       (alpha[0].bbox[0]-prior.bbox[0])/body_size,
+                       block.bbox[1]/raw.height)
+            candidates.append(feature)
+            if (block.bbox[1]-prior.bbox[3] >= body_size*1.2-.01
+                    and _raised_scan_note_opening(block, small, allow_numeric=True)):
+                teachers.append(feature)
+    matched = {}
+    for raw, block, prior, small, height, side, indent, y in candidates:
+        spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+        if (not spans or not spans[0].text.lstrip()[:1].isalpha()
+                or block.bbox[1]-prior.bbox[3] < body_size*1.2-.01):
+            continue
+        peers = [f for f in teachers if f[0].pno != raw.pno and f[5] == side
+                 and abs(f[0].width/raw.width-1) <= .03
+                 and abs(f[0].height/raw.height-1) <= .03
+                 and abs(f[3]-small) <= body_size*.2
+                 and abs(f[4]-height) <= body_size*.15
+                 and abs(f[6]-indent) <= .45
+                 and abs(f[7]-y)*raw.height <= body_size*3]
+        if len({f[0].pno for f in peers}) >= 3:
+            matched.setdefault(raw.pno, []).append(block.bbox)
+    return matched
+
+
+def _detached_scan_note_territories(raw, style, pixel_probe=None):
+    """Retain complete source-proved OCR footers as unnumbered uncertain notes."""
+    em = style.body_size
+    notes, ownership = [], set()
+    for block, prior, small, height in _scan_note_candidates(raw, style):
+        if id(block) in ownership:
+            continue
+        spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+        if not spans:
+            continue
+        first, box = spans[0], block.bbox
+        gap = box[1]-prior.bbox[3]
+        proven = (gap >= em*1.2-.01 and _raised_scan_note_opening(block, small))
+        proven = proven or (box in style.scan_note_lane_boxes.get(raw.pno, [])
+                           and gap >= em*1.2-.01)
+        if not proven:
+            if pixel_probe is None or not first.text.lstrip()[:1].isalpha():
+                continue
+            query = (max(min(prior.bbox[0], box[0]), first.bbox[0]-em*2),
+                     min(block.lines[0].bbox[1], first.bbox[1])-em*.4,
+                     first.bbox[0]-.5, first.bbox[3])
+            if query[2] <= query[0] or any(
+                    sp.bbox[0] < query[2] and query[0] < sp.bbox[2]
+                    and sp.bbox[1] < query[3] and query[1] < sp.bbox[3]
+                    for other in raw.text_blocks for line in other.lines for sp in line.spans):
+                continue
+            try:
+                ink = pixel_probe.source_ink_bounds(query)
+            except (AttributeError, ValueError, RuntimeError):
+                continue
+            if (not ink or not (small*.2 <= ink[2]-ink[0] <= small*.55
+                    and small*.2 <= ink[3]-ink[1] <= small*.55
+                    and ink[0] > query[0] and ink[1] > query[1]
+                    and ink[2] < query[2]-.2 and ink[3] < query[3]
+                    and first.bbox[3]-ink[3] >= small*.2
+                    and 0 < first.bbox[0]-ink[2] <= em)):
+                continue
+            box = (min(box[0], ink[0]), min(box[1], ink[1]),
+                   max(box[2], ink[2]), max(box[3], ink[3]))
+        lines = list(block.lines)
+        ownership.add(id(block))
+        # Continue only tight, uniformly smaller source blocks in this same
+        # terminal column. A new numeral is neither required nor inferred.
+        for following in sorted(raw.text_blocks, key=lambda b: b.bbox[1]):
+            if id(following) in ownership or following.bbox[1] < block.bbox[1]:
+                continue
+            if not (following.bbox[0] < prior.bbox[2]
+                    and prior.bbox[0] < following.bbox[2]):
+                continue
+            if (following.bbox[1]-box[3] > em*.5
+                    or following.bbox[0] < prior.bbox[0]-em
+                    or following.bbox[2] > prior.bbox[2]+em
+                    or not _scan_note_small_block(raw, following, style)):
+                break
+            lines.extend(following.lines)
+            ownership.add(id(following))
+            box = (min(box[0], following.bbox[0]), min(box[1], following.bbox[1]),
+                   max(box[2], following.bbox[2]), max(box[3], following.bbox[3]))
+        notes.append(Region('note', lines=lines, number=None,
+            bbox=box, uncertain=True, reason='pixel_note_territory'))
+    return notes
+
+
+def _split_off_notes(raw, style, skel, pixel_probe=None, _detached_pass=True):
     """Separate the footnote zone from the body, keeping multi-block notes together.
 
     The zone's start is chosen, not just found: a number read out of glyphs is
@@ -2169,6 +2356,25 @@ def _split_off_notes(raw, style, skel, pixel_probe=None):
     carry their own evidence and do not ask for the corroboration.
     """
     from . import note_evidence
+    unknown = (_detached_scan_note_territories(raw, style, pixel_probe)
+               if _detached_pass else [])
+    if unknown:
+        # Keep the original page available to the older opening validation.
+        # Removing real later notes first would let an earlier chart degree
+        # become the only apparent numeric opening and lose its veto.
+        body, notes = _split_off_notes(raw, style, skel, pixel_probe,
+                                      _detached_pass=False)
+        owned = {id(line) for note in unknown for line in note.lines}
+        body = [replace(block, lines=kept, bbox=_lines_bbox(kept, block.bbox))
+                for block in body
+                if (kept := [line for line in block.lines if id(line) not in owned])]
+        notes = [replace(note, lines=kept, bbox=_lines_bbox(kept, note.bbox))
+                 for note in notes
+                 if (kept := [line for line in note.lines if id(line) not in owned])]
+        order = {id(line): i for i, line in enumerate(
+            line for block in raw.text_blocks for line in block.lines)}
+        return body, sorted(notes+unknown, key=lambda note: min(
+            (order[id(line)] for line in note.lines), default=len(order)))
     # A short body page can leave most of its printed area to footnotes. The
     # isolated divider and smaller raised opening prove that territory even
     # when its first note is above the fixed lower-page percentage.

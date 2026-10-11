@@ -1,0 +1,5023 @@
+{
+ "pno": 190,
+ "width": 471.85003662109375,
+ "height": 687.8500366210938,
+ "blocks": [
+  {
+   "number": 19,
+   "bbox": [
+    0.0,
+    0.0,
+    471.8500061035156,
+    687.8400268554688
+   ],
+   "lines": [],
+   "kind": "image"
+  },
+  {
+   "number": 0,
+   "bbox": [
+    202.4499969482422,
+    98.14445495605469,
+    381.4119873046875,
+    106.20558166503906
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "CONFIGURATIONS",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        202.4499969482422,
+        98.14445495605469,
+        267.260498046875,
+        104.64445495605469
+       ],
+       "origin_y": 103.20001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      202.4499969482422,
+      98.14445495605469,
+      267.260498046875,
+      104.64445495605469
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "159",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        371.3999938964844,
+        99.20558166503906,
+        381.4119873046875,
+        106.20558166503906
+       ],
+       "origin_y": 104.6500244140625,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      371.3999938964844,
+      99.20558166503906,
+      381.4119873046875,
+      106.20558166503906
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 1,
+   "bbox": [
+    94.20001220703125,
+    139.75177001953125,
+    199.17601013183594,
+    154.75177001953125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "EXERCISE",
+       "size": 15.0,
+       "font": "TimesNewRomanPSMT",
+       "flags": 4,
+       "bbox": [
+        94.20001220703125,
+        139.75177001953125,
+        174.66000366210938,
+        154.75177001953125
+       ],
+       "origin_y": 151.20001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 15.0,
+       "font": "TimesNewRomanPSMT",
+       "flags": 4,
+       "bbox": [
+        175.97500610351562,
+        139.75177001953125,
+        179.72500610351562,
+        154.75177001953125
+       ],
+       "origin_y": 151.20001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "11",
+       "size": 15.0,
+       "font": "TimesNewRomanPSMT",
+       "flags": 4,
+       "bbox": [
+        184.97500610351562,
+        139.75177001953125,
+        199.17601013183594,
+        154.75177001953125
+       ],
+       "origin_y": 151.20001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      94.20001220703125,
+      139.75177001953125,
+      199.17601013183594,
+      154.75177001953125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 2,
+   "bbox": [
+    94.30001068115234,
+    162.2555694580078,
+    359.22607421875,
+    169.2555694580078
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "Q",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        94.30001068115234,
+        162.2555694580078,
+        99.50801086425781,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        99.50801086425781,
+        162.2555694580078,
+        100.65000915527344,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "U",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        100.65000915527344,
+        162.2555694580078,
+        105.94200897216797,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        105.94200897216797,
+        162.2555694580078,
+        107.09900665283203,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "AD",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        107.09900665283203,
+        162.2555694580078,
+        118.05001068115234,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        118.05001068115234,
+        162.2555694580078,
+        119.2070083618164,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "R",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        119.2070083618164,
+        162.2555694580078,
+        124.11400604248047,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        124.11400604248047,
+        162.2555694580078,
+        125.16400909423828,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "U",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        125.16400909423828,
+        162.2555694580078,
+        130.4560089111328,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        130.4560089111328,
+        162.2555694580078,
+        131.614013671875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "PLICITY",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        131.614013671875,
+        162.2555694580078,
+        163.60401916503906,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        164.5490264892578,
+        162.2555694580078,
+        166.23602294921875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "(M",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        168.6480255126953,
+        162.2555694580078,
+        178.38803100585938,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        178.38803100585938,
+        162.2555694580078,
+        179.84803771972656,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "O",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        179.84803771972656,
+        162.2555694580078,
+        185.0560302734375,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        185.0560302734375,
+        162.2555694580078,
+        186.24903869628906,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "D",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        186.24903869628906,
+        162.2555694580078,
+        191.49203491210938,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        191.49203491210938,
+        162.2555694580078,
+        192.6980438232422,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "A",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        192.6980438232422,
+        162.2555694580078,
+        197.38804626464844,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        197.38804626464844,
+        162.2555694580078,
+        198.50604248046875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "LITY)",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        198.50604248046875,
+        162.2555694580078,
+        220.35104370117188,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        220.97604370117188,
+        162.2555694580078,
+        222.6630401611328,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "OF",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        225.17604064941406,
+        162.2555694580078,
+        235.01902770996094,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        235.37603759765625,
+        162.2555694580078,
+        237.0630340576172,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "A",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        239.15003967285156,
+        162.2555694580078,
+        243.8400421142578,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        244.30703735351562,
+        162.2555694580078,
+        245.99403381347656,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "PLA",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        248.30003356933594,
+        162.2555694580078,
+        263.405029296875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        263.405029296875,
+        162.2555694580078,
+        264.52203369140625,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "N",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        264.52203369140625,
+        162.2555694580078,
+        269.8910217285156,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        269.8910217285156,
+        162.2555694580078,
+        271.1220397949219,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "E",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        271.1220397949219,
+        162.2555694580078,
+        275.69305419921875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        275.69305419921875,
+        162.2555694580078,
+        276.77203369140625,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "T’",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        276.77203369140625,
+        162.2555694580078,
+        283.7110290527344,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        283.7110290527344,
+        162.2555694580078,
+        284.7860412597656,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "S",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        284.7860412597656,
+        162.2555694580078,
+        288.7130432128906,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        288.38604736328125,
+        162.2555694580078,
+        290.07305908203125,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "ZO",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        292.300048828125,
+        162.2555694580078,
+        302.7150573730469,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        302.7150573730469,
+        162.2555694580078,
+        303.9570617675781,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "D",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        303.9570617675781,
+        162.2555694580078,
+        309.2000732421875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        309.2000732421875,
+        162.2555694580078,
+        310.4570617675781,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "IA",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        310.4570617675781,
+        162.2555694580078,
+        318.5540771484375,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        318.5540771484375,
+        162.2555694580078,
+        319.7210693359375,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "C",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        319.7210693359375,
+        162.2555694580078,
+        324.2150573730469,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        324.2150573730469,
+        162.2555694580078,
+        325.3210754394531,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "A",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        325.3210754394531,
+        162.2555694580078,
+        330.0110778808594,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        330.0110778808594,
+        162.2555694580078,
+        331.1780700683594,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "L",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        331.1780700683594,
+        162.2555694580078,
+        335.3990783691406,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        336.38507080078125,
+        162.2555694580078,
+        338.07208251953125,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "SIGN",
+       "size": 7.0,
+       "font": "Georgia",
+       "flags": 4,
+       "bbox": [
+        340.1000671386719,
+        162.2555694580078,
+        359.22607421875,
+        169.2555694580078
+       ],
+       "origin_y": 167.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      94.30001068115234,
+      162.2555694580078,
+      359.22607421875,
+      169.2555694580078
+     ],
+     "spacing_uncertain": true,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 3,
+   "bbox": [
+    90.70022583007812,
+    203.769287109375,
+    381.5752258300781,
+    224.66928100585938
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "Using",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        90.9500732421875,
+        203.769287109375,
+        112.95507049560547,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        112.95507049560547,
+        203.769287109375,
+        115.20507049560547,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "your",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        117.95906829833984,
+        203.769287109375,
+        136.1460723876953,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        136.1550750732422,
+        203.769287109375,
+        138.4050750732422,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "own",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        138.9690704345703,
+        203.769287109375,
+        154.9710693359375,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        155.06907653808594,
+        203.769287109375,
+        157.31907653808594,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "chart,",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        158.0680694580078,
+        203.769287109375,
+        180.4360809326172,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        180.4360809326172,
+        203.769287109375,
+        182.6860809326172,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "explore",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        183.2860870361328,
+        203.769287109375,
+        211.43807983398438,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        211.27308654785156,
+        203.769287109375,
+        213.52308654785156,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "how",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        214.27308654785156,
+        203.769287109375,
+        230.27508544921875,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        230.37307739257812,
+        203.769287109375,
+        232.62307739257812,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        232.97308349609375,
+        203.769287109375,
+        244.81007385253906,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        244.81907653808594,
+        203.769287109375,
+        247.06907653808594,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "quadruplicity",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        247.7810821533203,
+        203.769287109375,
+        300.296142578125,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        300.296142578125,
+        203.769287109375,
+        302.546142578125,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "of",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        303.0261535644531,
+        203.769287109375,
+        310.9731750488281,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        311.2761535644531,
+        203.769287109375,
+        313.5261535644531,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "each",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        313.3271484375,
+        203.769287109375,
+        330.6981506347656,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        330.6981506347656,
+        203.769287109375,
+        332.9481506347656,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "planet’s",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        333.4951477050781,
+        203.769287109375,
+        363.064208984375,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        362.8132019042969,
+        203.769287109375,
+        365.0632019042969,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "sign",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        365.8132019042969,
+        203.769287109375,
+        381.5752258300781,
+        212.769287109375
+       ],
+       "origin_y": 210.60000610351562,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      90.9500732421875,
+      203.769287109375,
+      381.5752258300781,
+      212.769287109375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "indicates",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        90.70022583007812,
+        215.66928100585938,
+        125.03822326660156,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        125.03822326660156,
+        215.66928100585938,
+        127.28822326660156,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        127.73722076416016,
+        215.66928100585938,
+        139.57421875,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        139.58322143554688,
+        215.66928100585938,
+        141.83322143554688,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "mode",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        141.83322143554688,
+        215.66928100585938,
+        163.2332305908203,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        163.355224609375,
+        215.66928100585938,
+        165.605224609375,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "which",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        165.605224609375,
+        215.66928100585938,
+        188.60922241210938,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        188.72422790527344,
+        215.66928100585938,
+        190.97422790527344,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "shapes",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        190.97422790527344,
+        215.66928100585938,
+        216.021240234375,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        215.8322296142578,
+        215.66928100585938,
+        218.0822296142578,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        218.38223266601562,
+        215.66928100585938,
+        230.11923217773438,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        229.99122619628906,
+        215.66928100585938,
+        232.24122619628906,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "planet’s",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        232.24122619628906,
+        215.66928100585938,
+        261.3602294921875,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        261.1092224121094,
+        215.66928100585938,
+        263.3592224121094,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "actions.",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        263.3592224121094,
+        215.66928100585938,
+        292.6092529296875,
+        224.66928100585938
+       ],
+       "origin_y": 222.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      90.70022583007812,
+      215.66928100585938,
+      292.6092529296875,
+      224.66928100585938
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 4,
+   "bbox": [
+    90.70025634765625,
+    240.21665954589844,
+    381.0748291015625,
+    247.71665954589844
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "1.",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        90.70025634765625,
+        240.21665954589844,
+        95.47576141357422,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        95.166259765625,
+        240.21665954589844,
+        96.97376251220703,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      90.70025634765625,
+      240.21665954589844,
+      96.97376251220703,
+      247.71665954589844
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "For",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        105.95025634765625,
+        240.21665954589844,
+        118.03475189208984,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        118.20025634765625,
+        240.21665954589844,
+        120.00775909423828,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "each",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        120.25025939941406,
+        240.21665954589844,
+        135.7842559814453,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        135.88026428222656,
+        240.21665954589844,
+        137.68775939941406,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "quadruplicity,",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        138.28025817871094,
+        240.21665954589844,
+        187.5687713623047,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        187.57626342773438,
+        240.21665954589844,
+        189.38375854492188,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "enter",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        190.25926208496094,
+        240.21665954589844,
+        208.38876342773438,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        208.53126525878906,
+        240.21665954589844,
+        210.33876037597656,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        210.58126831054688,
+        240.21665954589844,
+        221.07177734375,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        221.0792694091797,
+        240.21665954589844,
+        222.8867645263672,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "four",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        221.39627075195312,
+        240.21665954589844,
+        237.31076049804688,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        237.80426025390625,
+        240.21665954589844,
+        239.61175537109375,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "signs",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        239.40325927734375,
+        240.21665954589844,
+        256.81878662109375,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        256.8182678222656,
+        240.21665954589844,
+        258.6257629394531,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "that",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        259.21826171875,
+        240.21665954589844,
+        273.2857666015625,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        273.3832702636719,
+        240.21665954589844,
+        275.1907653808594,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "are",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        275.1902770996094,
+        240.21665954589844,
+        286.3727722167969,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        286.3802795410156,
+        240.21665954589844,
+        288.1877746582031,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "members",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        288.498291015625,
+        240.21665954589844,
+        320.7027893066406,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        320.8212890625,
+        240.21665954589844,
+        322.6287841796875,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "of",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        322.87030029296875,
+        240.21665954589844,
+        330.4302978515625,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        331.0283203125,
+        240.21665954589844,
+        332.8358154296875,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "that",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        331.72833251953125,
+        240.21665954589844,
+        346.1458435058594,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        346.2933349609375,
+        240.21665954589844,
+        348.100830078125,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "modality.",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        348.1933288574219,
+        240.21665954589844,
+        381.0748291015625,
+        247.71665954589844
+       ],
+       "origin_y": 246.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      105.95025634765625,
+      240.21665954589844,
+      381.0748291015625,
+      247.71665954589844
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 5,
+   "bbox": [
+    90.70034790039062,
+    252.1166534423828,
+    381.8319396972656,
+    259.61663818359375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "2.",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        90.70034790039062,
+        252.1166534423828,
+        96.32585144042969,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        96.01535034179688,
+        252.1166534423828,
+        97.8228530883789,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      90.70034790039062,
+      252.1166534423828,
+      97.8228530883789,
+      259.61663818359375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "For",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        106.05035400390625,
+        252.1166534423828,
+        118.13484954833984,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        118.25035095214844,
+        252.1166534423828,
+        120.05785369873047,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "each",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        121.49935150146484,
+        252.1166534423828,
+        137.28834533691406,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        137.38035583496094,
+        252.1166534423828,
+        139.18785095214844,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "planet,",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        140.38035583496094,
+        252.1166534423828,
+        164.8198699951172,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        164.90936279296875,
+        252.1166534423828,
+        166.71685791015625,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "enter",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        169.10935974121094,
+        252.1166534423828,
+        187.1898651123047,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        187.33236694335938,
+        252.1166534423828,
+        189.13986206054688,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "its",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        190.83236694335938,
+        252.1166534423828,
+        198.66586303710938,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        198.53236389160156,
+        252.1166534423828,
+        200.33985900878906,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "zodiacal",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        201.88336181640625,
+        252.1166534423828,
+        231.4518585205078,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        231.56436157226562,
+        252.1166534423828,
+        233.37185668945312,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "sign,",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        234.56436157226562,
+        252.1166534423828,
+        250.51486206054688,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        250.38735961914062,
+        252.1166534423828,
+        252.19485473632812,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "then",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        254.83636474609375,
+        252.1166534423828,
+        269.81988525390625,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        269.8273620605469,
+        252.1166534423828,
+        271.6348571777344,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "place",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        272.859375,
+        252.1166534423828,
+        291.5568542480469,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        291.8323669433594,
+        252.1166534423828,
+        293.6398620605469,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "a",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        295.2313537597656,
+        252.1166534423828,
+        299.5213623046875,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        299.28936767578125,
+        252.1166534423828,
+        301.09686279296875,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "check",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        303.03936767578125,
+        252.1166534423828,
+        322.22088623046875,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        322.3763732910156,
+        252.1166534423828,
+        324.1838684082031,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "in",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        326.0763854980469,
+        252.1166534423828,
+        332.72088623046875,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        332.5843811035156,
+        252.1166534423828,
+        334.3918762207031,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        336.7843933105469,
+        252.1166534423828,
+        347.3739013671875,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        347.4993896484375,
+        252.1166534423828,
+        349.306884765625,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "box",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        351.19940185546875,
+        252.1166534423828,
+        363.75640869140625,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        364.0644226074219,
+        252.1166534423828,
+        365.8719177246094,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "that",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        367.6644287109375,
+        252.1166534423828,
+        381.8319396972656,
+        259.61663818359375
+       ],
+       "origin_y": 257.9499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      106.05035400390625,
+      252.1166534423828,
+      381.8319396972656,
+      259.61663818359375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 6,
+   "bbox": [
+    106.10043334960938,
+    264.066650390625,
+    381.9618835449219,
+    271.566650390625
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "corresponds",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        106.10043334960938,
+        264.066650390625,
+        148.4039306640625,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        148.40443420410156,
+        264.066650390625,
+        150.21192932128906,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "to",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        151.471435546875,
+        264.066650390625,
+        157.99893188476562,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        157.82144165039062,
+        264.066650390625,
+        159.62893676757812,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "its",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        161.07144165039062,
+        264.066650390625,
+        168.9039306640625,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        168.721435546875,
+        264.066650390625,
+        170.5289306640625,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "modality",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        171.6224365234375,
+        264.066650390625,
+        203.12191772460938,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        203.33741760253906,
+        264.066650390625,
+        205.14491271972656,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "along",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        205.73741149902344,
+        264.066650390625,
+        225.49139404296875,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        225.6584014892578,
+        264.066650390625,
+        227.4658966064453,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "with",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        227.9593963623047,
+        264.066650390625,
+        243.16839599609375,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        243.17640686035156,
+        264.066650390625,
+        244.98390197753906,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "a",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        246.06640625,
+        264.066650390625,
+        250.3563995361328,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        250.02340698242188,
+        264.066650390625,
+        251.83090209960938,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "keyword",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        253.02340698242188,
+        264.066650390625,
+        283.307861328125,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        283.3953552246094,
+        264.066650390625,
+        285.2028503417969,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "that",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        286.1953430175781,
+        264.066650390625,
+        300.36285400390625,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        300.4603576660156,
+        264.066650390625,
+        302.2678527832031,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "describes",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        303.0103454589844,
+        264.066650390625,
+        334.60589599609375,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        334.69036865234375,
+        264.066650390625,
+        336.49786376953125,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        337.69036865234375,
+        264.066650390625,
+        348.1808776855469,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        348.1883850097656,
+        264.066650390625,
+        349.9958801269531,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "mode",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        351.1563720703125,
+        264.066650390625,
+        370.5888671875,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        370.8643798828125,
+        264.066650390625,
+        372.671875,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "by",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        373.6143798828125,
+        264.066650390625,
+        381.9618835449219,
+        271.566650390625
+       ],
+       "origin_y": 269.8999938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      106.10043334960938,
+      264.066650390625,
+      381.9618835449219,
+      271.566650390625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 7,
+   "bbox": [
+    90.25038146972656,
+    275.76666259765625,
+    381.88580322265625,
+    295.81927490234375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "which",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        106.20037841796875,
+        275.76666259765625,
+        126.88137817382812,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        126.97337341308594,
+        275.76666259765625,
+        128.78086853027344,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        130.1233673095703,
+        275.76666259765625,
+        140.61387634277344,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        140.62136840820312,
+        275.76666259765625,
+        142.42886352539062,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "action",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        142.93836975097656,
+        275.76666259765625,
+        164.7708740234375,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        164.9603729248047,
+        275.76666259765625,
+        166.7678680419922,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "takes",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        168.0603790283203,
+        275.76666259765625,
+        185.69287109375,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        185.69337463378906,
+        275.76666259765625,
+        187.50086975097656,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "place.",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        187.2833709716797,
+        275.76666259765625,
+        207.09288024902344,
+        283.26666259765625
+       ],
+       "origin_y": 281.6000061035156,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      106.20037841796875,
+      275.76666259765625,
+      207.09288024902344,
+      283.26666259765625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "3.",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        90.25038146972656,
+        286.81927490234375,
+        96.15038299560547,
+        295.81927490234375
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 9.0,
+       "font": "TimesNewRomanPS-BoldMT",
+       "flags": 20,
+       "bbox": [
+        95.75138092041016,
+        286.81927490234375,
+        98.00138092041016,
+        295.81927490234375
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      90.25038146972656,
+      286.81927490234375,
+      98.00138092041016,
+      295.81927490234375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Tally",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        106.55038452148438,
+        287.816650390625,
+        123.79488372802734,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        123.7223892211914,
+        287.816650390625,
+        125.52989196777344,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "the",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        126.37239074707031,
+        287.816650390625,
+        136.86289978027344,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        136.87039184570312,
+        287.816650390625,
+        138.67788696289062,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "numbers",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        139.58738708496094,
+        287.816650390625,
+        170.3928985595703,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        170.56039428710938,
+        287.816650390625,
+        172.36788940429688,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "for",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        171.31039428710938,
+        287.816650390625,
+        182.4748992919922,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        183.06739807128906,
+        287.816650390625,
+        184.87489318847656,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "each",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        185.21839904785156,
+        287.816650390625,
+        200.75238037109375,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        200.76039123535156,
+        287.816650390625,
+        202.56788635253906,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "modality",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        203.7473907470703,
+        287.816650390625,
+        235.04689025878906,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        235.21238708496094,
+        287.816650390625,
+        237.01988220214844,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "to",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        237.71238708496094,
+        287.816650390625,
+        244.23887634277344,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        244.06138610839844,
+        287.816650390625,
+        245.86888122558594,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "see",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        246.36138916015625,
+        287.816650390625,
+        256.8338623046875,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        257.0263671875,
+        287.816650390625,
+        258.8338623046875,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "if",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        259.57635498046875,
+        287.816650390625,
+        264.8363342285156,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        265.4343566894531,
+        287.816650390625,
+        267.2418518066406,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "any",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        266.28436279296875,
+        287.816650390625,
+        279.3088684082031,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        279.4063720703125,
+        287.816650390625,
+        281.2138671875,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "modality",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        281.8063659667969,
+        287.816650390625,
+        313.5078430175781,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        313.72332763671875,
+        287.816650390625,
+        315.53082275390625,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "predominates",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        315.0733337402344,
+        287.816650390625,
+        363.9858093261719,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        364.1532897949219,
+        287.816650390625,
+        365.9607849121094,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "or",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        366.4532775878906,
+        287.816650390625,
+        374.11077880859375,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        374.2532958984375,
+        287.816650390625,
+        376.060791015625,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "is",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        376.5032958984375,
+        287.816650390625,
+        381.88580322265625,
+        295.316650390625
+       ],
+       "origin_y": 293.6499938964844,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      106.55038452148438,
+      287.816650390625,
+      381.88580322265625,
+      295.316650390625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 8,
+   "bbox": [
+    106.20028686523438,
+    299.61663818359375,
+    132.7047882080078,
+    307.11663818359375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "lacking.",
+       "size": 7.5,
+       "font": "Georgia-Italic",
+       "flags": 6,
+       "bbox": [
+        106.20028686523438,
+        299.61663818359375,
+        132.7047882080078,
+        307.11663818359375
+       ],
+       "origin_y": 305.4499816894531,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      106.20028686523438,
+      299.61663818359375,
+      132.7047882080078,
+      307.11663818359375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 9,
+   "bbox": [
+    94.20028686523438,
+    335.25,
+    357.23834228515625,
+    353.48199462890625
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "Planet",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        94.20028686523438,
+        335.25,
+        115.28929138183594,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        115.28929138183594,
+        335.25,
+        117.28929138183594,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      94.20028686523438,
+      335.25,
+      117.28929138183594,
+      343.281982421875
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Tropical/",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        146.52529907226562,
+        335.25,
+        175.60130310058594,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        175.6092987060547,
+        335.25,
+        177.6092987060547,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      146.52529907226562,
+      335.25,
+      177.6092987060547,
+      343.281982421875
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Solid/",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        205.77330017089844,
+        335.25,
+        225.05630493164062,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        225.06430053710938,
+        335.25,
+        227.06430053710938,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      205.77330017089844,
+      335.25,
+      227.06430053710938,
+      343.281982421875
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Bi-corporeal/",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        265.404296875,
+        335.25,
+        308.66229248046875,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        308.76031494140625,
+        335.25,
+        310.76031494140625,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      265.404296875,
+      335.25,
+      310.76031494140625,
+      343.281982421875
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Keywords",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        325.4603271484375,
+        335.25,
+        357.23834228515625,
+        343.281982421875
+       ],
+       "origin_y": 341.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      325.4603271484375,
+      335.25,
+      357.23834228515625,
+      343.281982421875
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Cardinal",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        146.3003387451172,
+        345.45001220703125,
+        175.04232788085938,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        175.14031982421875,
+        345.45001220703125,
+        177.14031982421875,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "Signs",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        177.04031372070312,
+        345.45001220703125,
+        193.91030883789062,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        193.5983123779297,
+        345.45001220703125,
+        195.5983123779297,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      146.3003387451172,
+      345.45001220703125,
+      195.5983123779297,
+      353.48199462890625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Fixed",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        205.8493194580078,
+        345.45001220703125,
+        223.90731811523438,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": true,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        223.90731811523438,
+        345.45001220703125,
+        225.90731811523438,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "Signs",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        225.90731811523438,
+        345.45001220703125,
+        242.8283233642578,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        242.5663299560547,
+        345.45001220703125,
+        244.5663299560547,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      205.8493194580078,
+      345.45001220703125,
+      244.5663299560547,
+      353.48199462890625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    },
+    {
+     "spans": [
+      {
+       "text": "Mutable",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        265.3663330078125,
+        345.45001220703125,
+        292.6223449707031,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": " ",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        292.6223449707031,
+        345.45001220703125,
+        294.6223449707031,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      },
+      {
+       "text": "Signs",
+       "size": 8.0,
+       "font": "BookAntiqua-Italic",
+       "flags": 6,
+       "bbox": [
+        294.6223449707031,
+        345.45001220703125,
+        311.6673278808594,
+        353.48199462890625
+       ],
+       "origin_y": 351.25,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      265.3663330078125,
+      345.45001220703125,
+      311.6673278808594,
+      353.48199462890625
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 10,
+   "bbox": [
+    94.10032653808594,
+    374.99444580078125,
+    107.21382141113281,
+    381.49444580078125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "SUN",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        94.10032653808594,
+        374.99444580078125,
+        107.21382141113281,
+        381.49444580078125
+       ],
+       "origin_y": 380.04998779296875,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      94.10032653808594,
+      374.99444580078125,
+      107.21382141113281,
+      381.49444580078125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 11,
+   "bbox": [
+    94.20032501220703,
+    399.4444580078125,
+    122.57282257080078,
+    405.9444580078125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "JUPITER",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        94.20032501220703,
+        399.4444580078125,
+        122.57282257080078,
+        405.9444580078125
+       ],
+       "origin_y": 404.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      94.20032501220703,
+      399.4444580078125,
+      122.57282257080078,
+      405.9444580078125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 12,
+   "bbox": [
+    93.9503173828125,
+    423.9444580078125,
+    121.47682189941406,
+    430.4444580078125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "SATURN",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.9503173828125,
+        423.9444580078125,
+        121.47682189941406,
+        430.4444580078125
+       ],
+       "origin_y": 429.0,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.9503173828125,
+      423.9444580078125,
+      121.47682189941406,
+      430.4444580078125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 13,
+   "bbox": [
+    93.95032501220703,
+    448.64447021484375,
+    127.89433288574219,
+    455.14447021484375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "MERCURY",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.95032501220703,
+        448.64447021484375,
+        127.89433288574219,
+        455.14447021484375
+       ],
+       "origin_y": 453.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.95032501220703,
+      448.64447021484375,
+      127.89433288574219,
+      455.14447021484375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 14,
+   "bbox": [
+    93.95033264160156,
+    473.04443359375,
+    115.06382751464844,
+    479.54443359375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "MOON",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.95033264160156,
+        473.04443359375,
+        115.06382751464844,
+        479.54443359375
+       ],
+       "origin_y": 478.0999755859375,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.95033264160156,
+      473.04443359375,
+      115.06382751464844,
+      479.54443359375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 15,
+   "bbox": [
+    93.85032653808594,
+    497.64447021484375,
+    116.74183654785156,
+    504.14447021484375
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "VENUS",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.85032653808594,
+        497.64447021484375,
+        116.74183654785156,
+        504.14447021484375
+       ],
+       "origin_y": 502.70001220703125,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.85032653808594,
+      497.64447021484375,
+      116.74183654785156,
+      504.14447021484375
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 16,
+   "bbox": [
+    93.85033416748047,
+    522.2444458007812,
+    113.19783782958984,
+    528.7444458007812
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "MARS",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.85033416748047,
+        522.2444458007812,
+        113.19783782958984,
+        528.7444458007812
+       ],
+       "origin_y": 527.2999877929688,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.85033416748047,
+      522.2444458007812,
+      113.19783782958984,
+      528.7444458007812
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 17,
+   "bbox": [
+    93.70033264160156,
+    546.6944580078125,
+    136.67984008789062,
+    553.1944580078125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "ASCENDANT",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.70033264160156,
+        546.6944580078125,
+        136.67984008789062,
+        553.1944580078125
+       ],
+       "origin_y": 551.75,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.70033264160156,
+      546.6944580078125,
+      136.67984008789062,
+      553.1944580078125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  },
+  {
+   "number": 18,
+   "bbox": [
+    93.70033264160156,
+    571.4444580078125,
+    116.53233337402344,
+    577.9444580078125
+   ],
+   "lines": [
+    {
+     "spans": [
+      {
+       "text": "TOTAL",
+       "size": 6.5,
+       "font": "Cambria-Bold",
+       "flags": 20,
+       "bbox": [
+        93.70033264160156,
+        571.4444580078125,
+        116.53233337402344,
+        577.9444580078125
+       ],
+       "origin_y": 576.5,
+       "uncertain": false,
+       "punctuation_uncertain": false,
+       "encoding_unresolved": false,
+       "transcription_uncertain": false,
+       "char_boxes": []
+      }
+     ],
+     "bbox": [
+      93.70033264160156,
+      571.4444580078125,
+      116.53233337402344,
+      577.9444580078125
+     ],
+     "spacing_uncertain": false,
+     "transcription_uncertain": false
+    }
+   ],
+   "kind": "text"
+  }
+ ],
+ "images": [
+  {
+   "bbox": [
+    0.0,
+    0.0,
+    471.8500061035156,
+    687.8400268554688
+   ],
+   "area_ratio": 0.9999853830746088,
+   "page_background": false
+  }
+ ],
+ "drawings": 0,
+ "drawing_rects": [],
+ "source_geometry": {},
+ "text_layer_overpainted": true,
+ "text_layer_invisible": false,
+ "transcript_unverified": false,
+ "source_links": []
+}
