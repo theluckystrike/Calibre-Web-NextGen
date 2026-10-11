@@ -2452,6 +2452,45 @@ def _repeated_scan_note_lanes(raw_pages, body_size, table_labels):
     return matched
 
 
+def _pixel_divided_scan_note(raw, block, style, prior, pixel_probe):
+    """Prove an unmarked smaller terminal footer with an isolated source rule.
+
+    The caller supplies the existing OCR, typography, terminal-column and
+    caption/table vetoes. The rule query stays below every preceding glyph,
+    including a short body row after the last wide typography reference.
+    """
+    em = style.body_size
+    if (pixel_probe is None or len(block.lines) < 2
+            or not all(_scan_note_words([line]) for line in block.lines)
+            or not block.lines[0].stripped[:1].isalpha()):
+        return False
+    earlier = [sp for other in raw.text_blocks if other is not block
+               for line in other.lines for sp in line.spans
+               if sp.text.strip() and sp.bbox[3] <= block.bbox[1]
+               and sp.bbox[0] < block.bbox[2] and block.bbox[0] < sp.bbox[2]]
+    if not earlier:
+        return False
+    bottom = max(sp.bbox[3] for sp in earlier)
+    if block.bbox[1]-bottom < em*1.2-.01:
+        return False
+    query = (prior.bbox[0]-em, bottom+.5,
+             max(prior.bbox[2], block.bbox[2])+em, block.bbox[1]-.5)
+    try:
+        ink = pixel_probe.source_ink_bounds(query)
+        separator = pixel_probe.thin_separator(query, max_thickness=em*.2)
+    except (AttributeError, ValueError, RuntimeError):
+        return False
+    width = prior.bbox[2]-prior.bbox[0]
+    return bool(ink and isinstance(separator, dict)
+                and separator.get('max_thickness', em) <= em*.2
+                and separator.get('occupied_fraction', 0) >= .8
+                and width*.8 <= ink[2]-ink[0] <= width*1.08
+                and abs(ink[0]-prior.bbox[0]) <= em
+                and query[0] <= ink[0] < ink[2] <= query[2]
+                and ink[1] >= bottom+em*.5
+                and ink[3] <= block.bbox[1]-.5)
+
+
 def _detached_scan_note_territories(raw, style, pixel_probe=None):
     """Retain complete source-proved OCR footers as unnumbered uncertain notes."""
     em = style.body_size
@@ -2474,6 +2513,7 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
                             and gap >= height*.5-.01)
         proven = proven or (box in style.scan_note_lane_boxes.get(raw.pno, [])
                            and gap >= em*1.2-.01)
+        proven = proven or _pixel_divided_scan_note(raw, block, style, prior, pixel_probe)
         if not proven:
             if pixel_probe is None or not first.text.lstrip()[:1].isalpha():
                 continue
