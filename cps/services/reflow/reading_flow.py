@@ -6,6 +6,7 @@ witnesses never become a claimed transcription or visible replacement text.
 import re
 from xml.etree import ElementTree as ET
 from . import assemble, native_text
+from ._layout_flow import NOTICE_CLASSES
 
 END = re.compile(r'[.!?][\"\u201d\u2019\)\]]*\s*$')
 
@@ -44,8 +45,8 @@ def projection(node, images):
                          'source-glyph-original' in e.get('class', '').split()), None)
         image = next((e for e in original.iter() if e.tag.rsplit('}', 1)[-1] == 'img'), None) if original is not None else None
         return (images.get(image.get('src'), {}).get('text', '') if image is not None else '')+(node.tail or '')
-    if set(classes).intersection(('source-evidence-notice', 'source-reading-annotation',
-                                  'source-glyph-original', 'pdf-return')):
+    if set(classes).intersection(NOTICE_CLASSES | {'source-reading-annotation',
+                                                 'source-glyph-original', 'pdf-return'}):
         return node.tail or ''
     if tag == 'img':
         src = node.get('src', '')
@@ -56,28 +57,35 @@ def projection(node, images):
 
 
 def finish(chapters, book):
-    """Defer disclosures and notes to a completed paragraph.
+    """Retain disclosures and notes after the complete body flow.
 
     Run after admission and source joins, before link binding. Note IDs and
     source-page destinations survive, so existing links bind across chapters.
+    A figure's descriptive prose can finish while a body sentence is suspended
+    across it. Local punctuation therefore cannot release retained disclosures.
     """
     from .build_epub import _is_aside
     images = image_witnesses(book)
-    pending = []; raster_notes = []; moved = 0; complete = False; note_count = 0
+    pending = []; moved = 0; note_count = 0; raster_note_count = 0
     for chapter in chapters:
         kept = []
         for block in chapter.blocks:
+            # Bound note ownership is authorized by the original canonical
+            # markup. Annotation extraction can rename the epub namespace
+            # prefix during serialization without changing that ownership.
+            is_aside = _is_aside(block)
             root = ET.fromstring('<root xmlns:epub="http://www.idpf.org/2007/ops">'+block+'</root>')
             if not len(root):
                 kept.append(block); continue
             node = root[0]
             classes = node.get('class', '').split()
+            is_notice = bool(NOTICE_CLASSES.intersection(classes))
             # Alternative-reading annotations are generated copy too. Preserve
             # their IDs and inspection links, but never insert them in a word.
             parents = {c: p for p in root.iter() for c in p}
             changed = False
             for child in list(root.iter()):
-                if ('source-evidence-notice' in classes or
+                if (is_notice or
                         'source-reading-annotation' not in child.get('class', '').split()):
                     continue
                 parent = parents[child]; index = list(parent).index(child)
@@ -98,38 +106,26 @@ def finish(chapters, book):
                 # Uncertain printed notes retain their pixels in the notes
                 # section, never as rasters in the main reading flow. IDs and
                 # embedded Return actions remain available to link binding.
-                raster_notes.append(block); moved += 1; note_count += 1
+                pending.append(block); moved += 1; note_count += 1
+                raster_note_count += 1
                 continue
             if 'source-native-returns' in classes:
-                # Destination actions stay near their complete passage. Moving
-                # them to the note section would break the visible return flow.
-                (kept if complete else pending).append(block); moved += 1; continue
-            if _is_aside(block) or 'reflow-retained-furniture' in classes:
-                (kept if complete else pending).append(block)
+                # The action retains its href; its body destination span stays
+                # in place even when the action is deferred across chapters.
+                pending.append(block); moved += 1; continue
+            if is_aside or 'reflow-retained-furniture' in classes:
+                pending.append(block)
                 moved += 1; note_count += 1; continue
-            if 'source-evidence-notice' in classes:
-                (kept if complete else pending).append(block); moved += 1; continue
+            if is_notice:
+                pending.append(block); moved += 1; continue
             kept.append(block)
-            tag = node.tag.rsplit('}', 1)[-1]
-            if tag in ('p', 'blockquote') and 'caption' not in classes:
-                # OCR witnesses establish ownership, not the printed sentence
-                # boundary. A crop can contain a terminal OCR full stop while
-                # its visible last line continues into the next crop.
-                opaque_prose = any('source-raster' in e.get('class', '').split()
-                                   for e in node.iter())
-                complete = not opaque_prose and bool(END.search(projection(node, images).strip()))
-                if complete:
-                    kept.extend(pending); pending = []
-            elif tag != 'span':
-                complete = False
         chapter.blocks = kept
-    if (pending or raster_notes) and chapters:
-        # A label/index can end without sentence punctuation. Its remaining
-        # notes have an explicit notes section after the complete body lane,
-        # with no invented heading words in the source stream.
+    if pending and chapters:
+        # Keep every retained channel in encounter order, outside the body
+        # lane. Source text and destination anchors remain in their own order.
         chapters[-1].blocks.append('<section class="source-notes" epub:type="endnotes" '
-            'aria-label="Notes and source disclosures">'+''.join(raster_notes+pending)+'</section>')
-    return dict(version='source-reading-flow-1', moved_blocks=moved,
-                notes_checked=note_count, trailing_disclosures=len(pending),
-                raster_notes_in_notes_section=len(raster_notes),
+            'aria-label="Notes and source disclosures">'+''.join(pending)+'</section>')
+    return dict(version='source-reading-flow-2', moved_blocks=moved,
+                notes_checked=note_count, trailing_disclosures=len(pending)-raster_note_count,
+                raster_notes_in_notes_section=raster_note_count,
                 image_witnesses=images)

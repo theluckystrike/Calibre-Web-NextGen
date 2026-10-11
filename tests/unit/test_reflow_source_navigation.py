@@ -440,7 +440,7 @@ def test_leading_source_notice_does_not_join_across_completed_prose_or_real_stru
 
 
 def test_original_return_reaches_joined_source_before_prior_page_notes(tmp_path, monkeypatch):
-    """A source return reaches the moved passage; print markers retain note order."""
+    """A source return reaches the joined passage; notes leave the body lane."""
     with pymupdf.open() as doc:
         for text in ('An unfinished thought', 'continues here.'):
             doc.new_page(width=400, height=600).insert_text((40, 100), text, fontsize=12)
@@ -464,12 +464,17 @@ def test_original_return_reaches_joined_source_before_prior_page_notes(tmp_path,
         joined = next(p for p in chapter.iter(XHTML + 'p')
                       if 'An unfinished thought continues here.' in ''.join(p.itertext()))
         assert joined.find('.//*[@id="%s"]' % ident) is not None
-        # A separate target must not steal the print-page marker from its notes.
+        # The original page return still reaches the exact joined source span.
         assert ident != 'pg_0001'
         all_nodes = list(chapter.iter())
         note = next(n for n in all_nodes if n.tag == XHTML + 'aside')
         marker = next(n for n in all_nodes if n.get('id') == 'pg_0001')
-        assert all_nodes.index(note) < all_nodes.index(marker)
+        section = next(n for n in all_nodes if n.get('class') == 'source-notes')
+        assert note in list(section.iter())
+        assert 'Earlier source note.' in ''.join(note.itertext())
+        assert all_nodes.index(joined) < all_nodes.index(marker) < all_nodes.index(section)
+        assert len([n for n in all_nodes if n.get('id') == ident]) == 1
+        assert len([n for n in all_nodes if n.get('id') == 'pg_0001']) == 1
 
 
 @pytest.mark.parametrize('reason,label',[

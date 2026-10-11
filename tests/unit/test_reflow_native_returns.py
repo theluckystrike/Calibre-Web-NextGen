@@ -127,11 +127,20 @@ def test_publication_rewrites_exact_forward_and_return_pairs_across_chapters(tmp
             target,ident=resolve(name,a.get('href'))
             assert locations[ident][0]==target
             forward_id='pdfgoto_'+ident.removeprefix('pdfref_')
-            assert locations[forward_id][0]==name
+            destination_name,destination=locations[forward_id]
+            # The standalone Return action moves to retained notes; the actual
+            # inline destination stays in its source passage and chapter.
+            parents={child:parent for parent in docs[destination_name].iter() for child in parent}
+            cursor=destination
+            while cursor in parents:
+                cursor=parents[cursor]
+                assert cursor.get('class')!='source-notes'
+            section=next(n for n in docs[name].iter() if n.get('class')=='source-notes')
+            assert a in list(section.iter())
             source=docs[target]
-            assert any(resolve(target,n.get('href'))==(name,forward_id)
+            assert any(resolve(target,n.get('href'))==(destination_name,forward_id)
                        for n in source.iter() if '#' in n.get('href',''))
-            returns.append((name,target,ident))
+            returns.append((destination_name,target,ident))
     assert len(returns)==2
     assert any(a!=b for a,b,_ in returns) and any(a==b for a,b,_ in returns)
 

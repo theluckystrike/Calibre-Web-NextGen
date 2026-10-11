@@ -119,9 +119,12 @@ def test_disclosures_wait_for_completed_prose_across_raster_and_chapter_boundari
     assert chapters[1].blocks[:3] == [
         '<p><span class="source-raster"><img src="images/fig_p0000_0.jpg"/></span></p>',
         '<p>trine to Saturn at</p>', '<p>24° Sagittarius.</p>']
-    assert chapters[1].blocks[3].endswith('Punctuation uncertain</p>')
-    assert 'id="fn_3"' in chapters[1].blocks[4]
-    assert chapters[1].blocks[-1] == '<p class="source-evidence-notice">View original passage</p>'
+    deferred = ET.fromstring('<root xmlns:epub="http://www.idpf.org/2007/ops">'+chapters[1].blocks[3]+'</root>')[0]
+    assert deferred.get('class') == 'source-notes'
+    assert ''.join(deferred[0].itertext()) == 'Punctuation uncertain'
+    assert deferred[1].get('id') == 'fn_3'
+    assert ''.join(deferred[-1].itertext()) == 'View original passage'
+    assert len(chapters[1].blocks) == 4
     assert audit['notes_checked'] == 1
 
 
@@ -131,11 +134,12 @@ def test_inline_generated_annotation_preserves_word_adjacency_and_return_target(
         'Reviewed reading <a href="original-p0000.xhtml">Inspect source</a></span>'
         'junction is complete.</p>'])
     reading_flow.finish([chapter], assemble.Book())
-    root = ET.fromstring('<root>'+''.join(chapter.blocks)+'</root>')
+    root = ET.fromstring('<root xmlns:epub="http://www.idpf.org/2007/ops">'+''.join(chapter.blocks)+'</root>')
     assert ''.join(root[0].itertext()) == 'conjunction is complete.'
-    assert root[1].get('class') == 'source-evidence-notice'
-    assert root[1].find('span').get('id') == 'reading-return-test'
-    assert root[1].find('span/a').get('href') == 'original-p0000.xhtml'
+    assert root[1].get('class') == 'source-notes'
+    assert root[1][0].get('class') == 'source-evidence-notice'
+    assert root[1][0].find('span').get('id') == 'reading-return-test'
+    assert root[1][0].find('span/a').get('href') == 'original-p0000.xhtml'
 
 
 def test_raster_notes_live_in_notes_section_with_their_targets_and_returns():
@@ -158,7 +162,9 @@ def test_opaque_prose_ocr_period_does_not_release_notices_inside_printed_sentenc
         '<p>certificates. The complete live paragraph.</p>'])
     reading_flow.finish([chapter],book)
     assert chapter.blocks[1]=='<p>certificates. The complete live paragraph.</p>'
-    assert chapter.blocks[2]=='<p class="source-evidence-notice">OCR uncertain</p>'
+    deferred=ET.fromstring('<root xmlns:epub="http://www.idpf.org/2007/ops">'+chapter.blocks[2]+'</root>')[0]
+    assert deferred.get('class')=='source-notes'
+    assert ET.tostring(deferred[0],encoding='unicode')=='<p class="source-evidence-notice">OCR uncertain</p>'
 
 
 def test_uncertain_footer_crop_can_overlap_neighbouring_live_source_notes():

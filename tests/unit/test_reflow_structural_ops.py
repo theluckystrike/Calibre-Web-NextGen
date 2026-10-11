@@ -109,19 +109,24 @@ def assert_source_and_notices_preserved(before,after):
 
 
 def assert_opening_notice_placement(roots,heading):
-    # Source warnings follow complete prose, including a wrapped quotation.
-    # A heading or unfinished title paragraph cannot authorize their placement.
+    # Generated disclosures follow the complete book body, including wrapped
+    # quotations and intervening figure prose. Preserve their source links.
     blocks=[n for r in roots for n in r if n.get('role')!='doc-pagebreak']
     title=next(n for n in blocks if ''.join(n.itertext())=='Learning the sky')
     assert title.tag==X+('h2' if heading else 'p')
-    notices=[n for n in blocks if generated_notice(n) and
+    sections=[n for n in blocks if n.tag==X+'section' and
+              'source-notes' in n.get('class','').split()]
+    assert len(sections)==1 and sections[0] is blocks[-1]
+    section=sections[0]
+    assert 'endnotes' in section.get('{http://www.idpf.org/2007/ops}type','').split()
+    notices=[n for r in roots for n in r.iter() if generated_notice(n) and
         [a.get('href') for a in n.iter(X+'a')]==['original-p0000.xhtml#notes']]
     assert notices
-    for notice in notices:
-        previous=blocks[blocks.index(notice)-1]
-        assert previous.tag in (X+'p',X+'blockquote')
-        assert 'First source sentence.' in ''.join(previous.itertext())
-        assert blocks.index(notice)>blocks.index(title)
+    assert all(n in set(section.iter()) for n in notices)
+    assert all(n in set(section.iter()) for r in roots for n in r.iter() if generated_notice(n))
+    assert any('First source sentence.' in ''.join(n.itertext()) for n in blocks[:-1])
+    assert blocks.index(section)>blocks.index(title)
+
 
 
 @pytest.mark.parametrize('damage',['changed_source','dropped_source','reordered_source',
@@ -352,8 +357,14 @@ def test_enriched_marks_records_survive_actual_approved_and_fallback_builder(sou
         assert any(a.get('href')=='original-p0000.xhtml#page' for r in roots for a in r.iter(X+'a'))
         if selection and selection[0]==choose(p,'e0','heading'):
             chapter=next(r for r in roots if any('Learning the sky' in ''.join(h.itertext()) for h in r.iter(X+'h2')))
-            assert 'Some note labels or associations' in ''.join(chapter.itertext())
-            assert 'OCR uncertain' in ''.join(chapter.itertext())
+            section=next(n for r in roots for n in r.iter(X+'section')
+                         if 'source-notes' in n.get('class','').split())
+            assert section is list(roots[-1])[-1]
+            assert 'endnotes' in section.get('{http://www.idpf.org/2007/ops}type','').split()
+            assert 'Some note labels or associations' in ''.join(section.itertext())
+            assert 'OCR uncertain' in ''.join(section.itertext())
+            assert 'Some note labels or associations' not in ''.join(chapter.itertext())
+            assert 'OCR uncertain' not in ''.join(chapter.itertext())
     fallback=tmp/'enriched-fallback.epub'
     build_epub.build(book,str(fallback),doc=doc,source_pages={0:canonical},page_html={0:'<script>bad</script>'})
     assert any('source'==''.join(e.itertext()) for r in texts(fallback) for e in r.iter(X+'span'))
