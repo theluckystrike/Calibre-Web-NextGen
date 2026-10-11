@@ -1683,6 +1683,126 @@ def _retained_source_rect(rect, audits):
                 rect[1]+(rect[3]-rect[1])*y1/height)
     return tuple(rect)
 
+
+def _exclude_source_furniture_pixels(data, reading_bbox, furniture_boxes=(),
+                                     protected_boxes=()):
+    """Exclude complete owned header components, retaining every other pixel.
+
+    Source ownership authorizes glyph components, not a rectangular page band.
+    A component connected to chart ink, leaving the bounded glyph context, or
+    touching another source glyph remains intact. The original evidence image
+    is published separately and never passes through this presentation step.
+    """
+    import io
+    from PIL import Image, ImageDraw
+
+    def valid(box):
+        return (len(box) == 4 and all(math.isfinite(float(v)) for v in box)
+                and box[2] > box[0] and box[3] > box[1])
+
+    if not furniture_boxes or not valid(reading_bbox):
+        return data, []
+    owned = [tuple(box) for box in furniture_boxes if valid(box)]
+    if not owned:
+        return data, []
+    try:
+        image = Image.open(io.BytesIO(data)).convert('RGB')
+    except (OSError, ValueError):
+        return data, []
+    width, height = image.size
+    x0, y0, x1, y1 = reading_bbox
+    sx, sy = width/(x1-x0), height/(y1-y0)
+
+    def mask(boxes, padding=0):
+        result = Image.new('L', image.size)
+        draw = ImageDraw.Draw(result)
+        for a, b, c, d in boxes:
+            left, top = math.ceil((a-x0-padding)*sx), math.ceil((b-y0-padding)*sy)
+            right, bottom = math.floor((c-x0+padding)*sx), math.floor((d-y0+padding)*sy)
+            if left <= right and top <= bottom:
+                draw.rectangle((left, top, right, bottom), fill=255)
+        return result.tobytes()
+
+    core, context = mask(owned), mask(owned, 3)
+    protected = mask([tuple(box) for box in protected_boxes if valid(box)])
+    gray = image.convert('L').tobytes()
+    visited = bytearray(width*height)
+    pixels = image.load()
+    audit, changed = [], False
+    for seed, inside in enumerate(core):
+        if not inside or visited[seed] or gray[seed] >= 240:
+            continue
+        pending, component, safe = [seed], [], True
+        visited[seed] = 1
+        while pending:
+            at = pending.pop()
+            component.append(at)
+            safe = safe and bool(context[at]) and not protected[at]
+            x, y = at % width, at // width
+            for yy in range(max(0, y-1), min(height, y+2)):
+                for xx in range(max(0, x-1), min(width, x+2)):
+                    neighbour = yy*width+xx
+                    if not visited[neighbour] and gray[neighbour] < 240:
+                        visited[neighbour] = 1
+                        pending.append(neighbour)
+        if not safe:
+            continue
+        xs, ys = [at % width for at in component], [at // width for at in component]
+        bounds = [min(xs), min(ys), max(xs)+1, max(ys)+1]
+        for at in component:
+            pixels[at % width, at // width] = (255, 255, 255)
+        changed = True
+        audit.append(dict(action='exclude_owned_furniture_component',
+            pixel_bbox=bounds, size=[width, height], reading_bbox=list(reading_bbox),
+            source_bbox=[x0+bounds[0]/sx, y0+bounds[1]/sy,
+                         x0+bounds[2]/sx, y0+bounds[3]/sy], pixels=len(component)))
+    if not changed:
+        return data, []
+    output = io.BytesIO()
+    image.save(output, format='PNG', optimize=True)
+    return output.getvalue(), audit
+
+
+def _source_furniture_pixel_boxes(book, pno, figure):
+    """Select only source-proved running heads in scan figure carriers."""
+    inventory = getattr(book, 'source_inventory', {}).get(pno, {})
+    geometry = inventory.get('source_geometry', {})
+    rect = geometry.get('page_rect', ())
+    if (figure.get('found') not in ('scan_figure_band', 'scan_figure_side')
+            or figure.get('full_page')
+            or figure.get('source_geometry', {}).get('space') != 'reading'
+            or geometry.get('space') != 'reading' or len(rect) != 4
+            or rect[3] <= rect[1]
+            or not any(image.get('page_background') if isinstance(image, dict)
+                       else getattr(image, 'page_background', False)
+                       for image in inventory.get('raw_images', ()))):
+        return [], []
+    rows = {row['id']: row['source'] for row in inventory.get('lines', ())}
+    proved = set()
+    for region in inventory.get('regions', ()):
+        box, ids = region.get('bbox'), region.get('line_ids', ())
+        if (region.get('suggested_kind') != 'furniture'
+                or region.get('reason') not in ('repeated_scan_spread_head', 'repeated_portrait_head')
+                or region.get('geometry_status') != 'valid' or not box or not ids
+                or box[1] < rect[1] or box[3] > rect[1]+(rect[3]-rect[1])*.12
+                or any(line_id not in rows for line_id in ids)):
+            continue
+        if any(sum(char.isalpha() for char in rows[line_id].text) < 6 for line_id in ids):
+            continue
+        if any(other.get('suggested_kind') != 'furniture'
+               and any(line_id in other.get('line_ids', ()) for line_id in ids)
+               for other in inventory.get('regions', ())):
+            continue
+        proved.update(ids)
+    furniture, protected = [], []
+    for line_id, line in rows.items():
+        destination = furniture if line_id in proved else protected
+        destination.extend(tuple(span.bbox) for span in line.spans if span.text.strip())
+    for region in inventory.get('regions', ()):
+        if region.get('suggested_kind') in ('caption', 'table') and region.get('bbox'):
+            protected.append(tuple(region['bbox']))
+    return furniture, protected
+
 def _figure_images(chapters, doc, book, package, figure_transform=None, owned_images=(),
                    runtime_progress=None, required_source_regions=(),
                    figure_presentation=None):
@@ -1772,6 +1892,7 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         if figure.get('needs_ink') and geometry.get('space')=='reading':
             ink_doc=SourceDisplay(doc,pno,dict(geometry,layer='ocr')).query_document(isolate=True)
         data = None
+        whole_page_fallback = False
         try:
             # A source-bound unmatched-glyph obligation outranks the optional
             # artwork threshold: sparse ink still needs its original pixels.
@@ -1798,6 +1919,7 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
                 # honest remainder -- the reader loses nothing that was there.
                 try:
                     data = extract.crop_jpeg(render_doc, pno, _page_rect(render_doc, pno))
+                    whole_page_fallback = True
                 except Exception:                                 # pragma: no cover
                     pass
             if data is None:
@@ -1805,6 +1927,13 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         finally:
             if ink_doc is not render_doc:ink_doc.close()
         if data is not None:
+            if src not in required_source_regions and not whole_page_fallback:
+                furniture, protected = _source_furniture_pixel_boxes(book, pno, figure)
+                if furniture:
+                    data, exclusions = _exclude_source_furniture_pixels(
+                        data, bbox, furniture, protected)
+                    if exclusions:
+                        figure['source_furniture_exclusions'] = exclusions
             if not figure.get('full_page') and (geometry.get('space') == 'reading' or
                     figure.get('found', '').startswith(('scan_', 'ocr_', 'uncertain_scan_'))):
                 from .crop_edges import trim_source_edges

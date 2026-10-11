@@ -678,7 +678,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
     for raw,line,side,letters,keyed,interior,offset,_ in candidates:
         height,gap,reliable = measured[(raw.pno,id(line))]
         if (keyed or interior or (raw.pno,tuple(line.bbox)) in vetoed
-                or line.bbox[3]-line.bbox[1] > height or gap < height
+                or line.bbox[3]-line.bbox[1] > 1.25*height or gap < height
                 or any(tuple(box)==tuple(line.bbox)
                        for box in (table_labels or {}).get(raw.pno,[]))):
             continue
@@ -687,7 +687,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
             other_height,other_gap,trust = measured[(other.pno,id(head))]
             edge = 0 if panel == 0 else 2
             if (other.pno == raw.pno or abs(other.pno-raw.pno)>12 or row_keys or inside
-                    or head.bbox[3]-head.bbox[1] > other_height or other_gap < other_height
+                    or head.bbox[3]-head.bbox[1] > 1.25*other_height or other_gap < other_height
                     or abs(head.bbox[edge]/other.width-line.bbox[0 if side==0 else 2]/raw.width)
                         > (.025 if panel==side else 1)
                     or abs(head.bbox[1]/other.height-line.bbox[1]/raw.height)>.02
@@ -710,7 +710,10 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
             matching = {other.pno for other,_,panel,text,o,_ in peers
                         if panel==side and o==off and
                         SequenceMatcher(None,letters,text,autojunk=False).ratio()>=.55}
-            if len(matching)<3 and not any(
+            # The target and two independent matching leaves establish an
+            # authored-title template; folio placement still needs three other
+            # reliable leaves on each side.
+            if len(matching)<2 and not any(
                     sum(SequenceMatcher(None,anchor,text,autojunk=False).ratio()>=.55
                         for text in opposite)>=3 for anchor in opposite):
                 continue
@@ -718,7 +721,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
                          if ln.stripped and ln.bbox[1]>=line.bbox[3]
                          and ((ln.bbox[0]+ln.bbox[2])/2<raw.width*.5 if side==0
                               else (ln.bbox[0]+ln.bbox[2])/2>raw.width*.5)]
-            if len(matching)<3 and (not following or
+            if len(matching)<2 and (not following or
                     not min(following,key=lambda ln:ln.bbox[1]).stripped[:1].islower()):
                 continue
             qualified.append(off)
