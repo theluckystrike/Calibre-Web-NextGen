@@ -2232,7 +2232,8 @@ def _scan_note_candidates(raw, style):
         larger = _scan_note_words([prior])
         if (small > median(sp.size for sp in larger)*.9
                 or height > median(sp.bbox[3]-sp.bbox[1] for sp in larger)*.9
-                or block.bbox[1]-prior.bbox[3] < em*.8-.01
+                or block.bbox[1]-prior.bbox[3] < em*(
+                    .5 if _close_raised_scan_note(block, small) else .8)-.01
                 or block.bbox[0] < prior.bbox[0]-em
                 or block.bbox[2] > prior.bbox[2]+em):
             continue
@@ -2263,6 +2264,83 @@ def _raised_scan_note_opening(block, small, allow_numeric=False):
             and first.size <= small*.75 and following.text.lstrip()[:1].isalpha()
             and first.bbox[1] <= following.bbox[1]+small*.2
             and first.bbox[3] <= following.bbox[3]-small*.2)
+
+
+def _close_raised_scan_note(block, small):
+    """A raised damaged label and hanging smaller rows prove a closer footer.
+
+    The ordinary unmarked-footer clearance is unchanged. A single row, an
+    unraised symbol or a reliable punctuation token supplies no such proof.
+    """
+    if len(block.lines) < 2 or not _raised_scan_note_opening(block, small):
+        return False
+    opening = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    return all(line.spans and line.stripped[:1].isalpha()
+               and line.bbox[0] <= opening[1].bbox[0]-small*.5
+               and abs(line.bbox[0]-block.bbox[0]) <= small*.25
+               for line in block.lines[1:])
+
+
+def _short_scan_note_tail(raw, block, style, preceding):
+    """Keep a short hanging tail despite one inflated OCR word-size estimate."""
+    em = style.body_size
+    alpha = _scan_note_words(block.lines)
+    if (len(block.lines) != 1 or not 1 <= len(alpha) <= 4
+            or any(sp.font != 'ocr' for line in block.lines for sp in line.spans)
+            or CAPTION_LINE.match(block.lines[0].stripped)
+            or _squashed_caption(block.lines[0].stripped)
+            or any(box[0] <= block.bbox[0] and box[1] <= block.bbox[1]
+                   and box[2] >= block.bbox[2] and box[3] >= block.bbox[3]
+                   for box in style.scan_table_label_boxes.get(raw.pno, []))
+            or not 0 <= block.bbox[1]-preceding.bbox[3] <= em*.3
+            or abs(block.bbox[0]-preceding.bbox[0]) > em*.25
+            or not any(sp.size <= em*.86 and not (sp.uncertain or
+                       sp.transcription_uncertain or sp.encoding_unresolved)
+                       for sp in alpha)
+            or any(sp.size > em*1.1 or sp.bbox[3]-sp.bbox[1] > em*.85
+                   for sp in alpha)
+            or median(sp.bbox[3]-sp.bbox[1] for sp in alpha) > em*.7):
+        return False
+    return True
+
+
+def _adjacent_raised_scan_note(raw, block, style, seed, small, height, box):
+    """An aligned damaged opening continues an independently proved footer.
+
+    A degree-shaped OCR token alone remains ineligible. Here the original
+    raised-label and word starts, smaller type, and bounded row clearance
+    establish source ownership without reading the damaged token as a digit.
+    """
+    em = style.body_size
+    if (not block.lines or not -.1*em <= block.bbox[1]-box[3] <= em*.5
+            or any(sp.font != 'ocr' for line in block.lines for sp in line.spans)
+            or any(CAPTION_LINE.match(line.stripped) or
+                   _squashed_caption(line.stripped) for line in block.lines)
+            or any(bound[0] <= line.bbox[0] and bound[1] <= line.bbox[1]
+                   and bound[2] >= line.bbox[2] and bound[3] >= line.bbox[3]
+                   for line in block.lines
+                   for bound in style.scan_table_label_boxes.get(raw.pno, []))):
+        return False
+    opening = [sp for sp in seed.lines[0].spans if sp.text.strip()]
+    spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    alpha = _scan_note_words(block.lines)
+    if len(opening) < 2 or len(spans) < 2 or not alpha:
+        return False
+    first, following = spans[:2]
+    label = first.text.strip()
+    measured = median(sp.size for sp in alpha)
+    glyph_height = median(sp.bbox[3]-sp.bbox[1] for sp in alpha)
+    return (1 <= len(label) <= 3 and not any(c.isalnum() for c in label)
+            and (first.uncertain or first.transcription_uncertain
+                 or first.encoding_unresolved)
+            and following.text.lstrip()[:1].isalpha()
+            and measured <= min(em*.95, small*1.25)
+            and glyph_height <= min(em*.7, height*1.25)
+            and first.size <= measured*.75
+            and first.bbox[1] <= following.bbox[1]+measured*.2
+            and first.bbox[3] <= following.bbox[3]-measured*.2
+            and abs(first.bbox[0]-opening[0].bbox[0]) <= em*.25
+            and abs(following.bbox[0]-opening[1].bbox[0]) <= em*.25)
 
 
 def _repeated_scan_note_lanes(raw_pages, body_size, table_labels):
@@ -2319,6 +2397,8 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
         first, box = spans[0], block.bbox
         gap = box[1]-prior.bbox[3]
         proven = (gap >= em*1.2-.01 and _raised_scan_note_opening(block, small))
+        close_raised = _close_raised_scan_note(block, small)
+        proven = proven or (close_raised and gap >= em*.5-.01)
         proven = proven or (box in style.scan_note_lane_boxes.get(raw.pno, [])
                            and gap >= em*1.2-.01)
         if not proven:
@@ -2358,7 +2438,11 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
             if (following.bbox[1]-box[3] > em*.5
                     or following.bbox[0] < prior.bbox[0]-em
                     or following.bbox[2] > prior.bbox[2]+em
-                    or not _scan_note_small_block(raw, following, style)):
+                    or not (_scan_note_small_block(raw, following, style)
+                            or (close_raised and _short_scan_note_tail(
+                                raw, following, style, lines[-1]))
+                            or (close_raised and _adjacent_raised_scan_note(
+                                raw, following, style, block, small, height, box)))):
                 break
             lines.extend(following.lines)
             ownership.add(id(following))
