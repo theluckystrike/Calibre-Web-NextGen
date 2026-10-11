@@ -584,6 +584,67 @@ class ScanPixelProbe(object):
         """
         return ScanPixelProbe(self._doc, self._pno).ink_bounds(rect)
 
+    def source_raised_prefix(self, word_bbox):
+        """Measure an isolated raised ink prefix inside a merged OCR word box.
+
+        No character is read. Two small, slender source components must precede
+        larger lexical ink across a substantial empty channel. Original text
+        masks are deliberately absent: the caller retains the complete source
+        span and uses this geometry only to establish its printed territory.
+        """
+        if (len(word_bbox) != 4 or not all(math.isfinite(float(v)) for v in word_bbox)
+                or word_bbox[2] <= word_bbox[0] or word_bbox[3] <= word_bbox[1]):
+            return None
+        clip = pymupdf.Rect(word_bbox) + (-.5, -.5, .5, .5)
+        clip &= self._doc[self._pno].rect
+        if clip.is_empty:
+            return None
+        scale = _bounded_scale(clip, 3)
+        pix = self._doc[self._pno].get_pixmap(matrix=pymupdf.Matrix(scale, scale),
+                                            clip=clip, alpha=False)
+        data, channels, width, height = pix.samples, min(pix.n, 3), pix.width, pix.height
+        dark = {(x, y) for y in range(height) for x in range(width)
+                if min(data[(y*width+x)*pix.n:(y*width+x)*pix.n+channels]) < 230}
+        components = []
+        while dark:
+            seed = dark.pop(); stack = [seed]; points = [seed]
+            while stack:
+                x, y = stack.pop()
+                for dx in (-1, 0, 1):
+                    for dy in (-1, 0, 1):
+                        neighbor = (x+dx, y+dy)
+                        if neighbor in dark:
+                            dark.remove(neighbor); stack.append(neighbor); points.append(neighbor)
+            if len(points) >= 4:
+                # SourceDisplay can rotate the original PDF for this query;
+                # MuPDF's pixmap origin then belongs to that transformed frame.
+                # The bounded logical clip is our reading-coordinate origin,
+                # as in ink_bounds, rather than pix.x/pix.y.
+                components.append((clip.x0+min(x for x, y in points)/scale,
+                                   clip.y0+min(y for x, y in points)/scale,
+                                   clip.x0+(max(x for x, y in points)+1)/scale,
+                                   clip.y0+(max(y for x, y in points)+1)/scale))
+        components.sort()
+        if len(components) < 3:
+            return None
+        a, b = components[:2]
+        prefix = (min(a[0], b[0]), min(a[1], b[1]), max(a[2], b[2]), max(a[3], b[3]))
+        lexical = (min(c[0] for c in components[2:]), min(c[1] for c in components[2:]),
+                   max(c[2] for c in components[2:]), max(c[3] for c in components[2:]))
+        word_height = lexical[3]-lexical[1]
+        prefix_height = prefix[3]-prefix[1]
+        gap = lexical[0]-prefix[2]
+        if (word_height <= 0 or not .35*word_height <= prefix_height <= .65*word_height
+                or prefix[2]-prefix[0] > word_height*.9
+                or gap < word_height*.65
+                or prefix[3] > lexical[3]-word_height*.3
+                or abs(a[1]-b[1]) > word_height*.2
+                or abs(a[3]-b[3]) > word_height*.2
+                or any(c[2]-c[0] > (c[3]-c[1])*.45 for c in (a, b))
+                or any(c[3]-c[1] < prefix_height*.7 for c in (a, b))):
+            return None
+        return dict(prefix_bbox=prefix, lexical_bbox=lexical, gap=gap)
+
     def ink_bounds(self, rect):
         """Conservative PDF-space extent of source artwork in a bounded clip.
 

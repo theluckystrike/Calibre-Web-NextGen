@@ -20,6 +20,7 @@ chart labels actually are — stray single glyphs and columns of numbers.
 """
 
 import re
+import math
 from collections import Counter, defaultdict
 from dataclasses import dataclass, field, replace
 from difflib import SequenceMatcher
@@ -545,6 +546,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
     Only exact original occurrences acquire the role; no text is repaired.
     """
     candidates = []
+    measured = {}
     for raw in raw_pages:
         if not raw.is_page_scan or raw.width < raw.height * 1.2:
             continue
@@ -609,16 +611,24 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
             trailing = _TRAILING_PRINTED_FOLIO.fullmatch(first.stripped)
             folio = int(leading[1]) if leading else int(trailing[2]) if trailing else None
             folio_offset = folio-2*raw.pno-side if folio is not None else None
+            edge_span = first.spans[0] if side == 0 else first.spans[-1]
+            damaged_edge = (edge_span.uncertain and
+                            re.fullmatch(r'[A-Za-z0-9]{1,5}', edge_span.text.strip()) and
+                            any(ch.isdigit() for ch in edge_span.text))
+            has_edge = folio is not None or damaged_edge
             needs_folio = first.bbox[3] > raw.height*.08 or first.bbox[3]-first.bbox[1] > height*.75
             if (len(letters) < 6 or len(first.stripped) > BAND_TEXT_MAX or CAPTION_LINE.match(first.stripped)
-                    or first.bbox[3] > raw.height*(.12 if folio is not None else .08)
-                    or first.bbox[3]-first.bbox[1] > height*(1.25 if folio is not None else .75)
+                    or first.bbox[3] > raw.height*(.12 if has_edge else .08)
+                    or first.bbox[3]-first.bbox[1] > height*(1.25 if has_edge else .75)
                     or first.bbox[2]-first.bbox[0] > raw.width*.32 or not remaining
                     or min(line.bbox[1] for line in remaining)-first.bbox[3] < height*.5
                     or min(alignments) > raw.width*.03):
                 continue
             candidates.append((raw, first, side, letters, keyed,
                                keyed and outer_alignment > raw.width*.03,folio_offset,needs_folio))
+            measured[(raw.pno, id(first))] = (height,
+                min(line.bbox[1] for line in remaining)-first.bbox[3],
+                folio is not None and not edge_span.uncertain)
     proved = defaultdict(list)
     vetoes = []
     for raw, line, side, letters, keyed, interior_label, folio_offset, needs_folio in candidates:
@@ -660,6 +670,60 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
     # each other. All candidates still have measured wrapped prose and gutters.
     original={pno:{tuple(box) for box in boxes} for pno,boxes in proved.items()}
     vetoed={(raw.pno,tuple(line.bbox)) for raw,line,_ in vetoes}
+    # Chapter openings can interrupt the eligible running-head sequence. A
+    # smaller, well-separated margin row can still have a measured two-sided
+    # template: three other reliable folios on each physical side establish
+    # the same offset, and the opposing title recurs independently. Uncertain
+    # edge ink can use this placement proof, but never teaches a folio reading.
+    for raw,line,side,letters,keyed,interior,offset,_ in candidates:
+        height,gap,reliable = measured[(raw.pno,id(line))]
+        if (keyed or interior or (raw.pno,tuple(line.bbox)) in vetoed
+                or line.bbox[3]-line.bbox[1] > height or gap < height
+                or any(tuple(box)==tuple(line.bbox)
+                       for box in (table_labels or {}).get(raw.pno,[]))):
+            continue
+        peers = []
+        for other,head,panel,text,row_keys,inside,other_offset,_ in candidates:
+            other_height,other_gap,trust = measured[(other.pno,id(head))]
+            edge = 0 if panel == 0 else 2
+            if (other.pno == raw.pno or abs(other.pno-raw.pno)>12 or row_keys or inside
+                    or head.bbox[3]-head.bbox[1] > other_height or other_gap < other_height
+                    or abs(head.bbox[edge]/other.width-line.bbox[0 if side==0 else 2]/raw.width)
+                        > (.025 if panel==side else 1)
+                    or abs(head.bbox[1]/other.height-line.bbox[1]/raw.height)>.02
+                    or (panel==side and abs((head.bbox[2]-head.bbox[0])/other.width-
+                        (line.bbox[2]-line.bbox[0])/raw.width)>.045)
+                    or any(tuple(box)==tuple(head.bbox)
+                           for box in (table_labels or {}).get(other.pno,[]))):
+                continue
+            peers.append((other,head,panel,text,other_offset,trust))
+        offsets = {off for _,_,panel,_,off,trust in peers if trust and panel==side}
+        qualified = []
+        for off in offsets:
+            if reliable and off != offset:
+                continue
+            if any(len({other.pno for other,_,panel,_,o,trust in peers
+                        if panel==which and trust and o==off})<3 for which in (0,1)):
+                continue
+            opposite = [text for _,_,panel,text,o,trust in peers
+                        if panel!=side and trust and o==off]
+            matching = {other.pno for other,_,panel,text,o,_ in peers
+                        if panel==side and o==off and
+                        SequenceMatcher(None,letters,text,autojunk=False).ratio()>=.55}
+            if len(matching)<3 and not any(
+                    sum(SequenceMatcher(None,anchor,text,autojunk=False).ratio()>=.55
+                        for text in opposite)>=3 for anchor in opposite):
+                continue
+            following = [ln for block in raw.text_blocks for ln in block.lines
+                         if ln.stripped and ln.bbox[1]>=line.bbox[3]
+                         and ((ln.bbox[0]+ln.bbox[2])/2<raw.width*.5 if side==0
+                              else (ln.bbox[0]+ln.bbox[2])/2>raw.width*.5)]
+            if len(matching)<3 and (not following or
+                    not min(following,key=lambda ln:ln.bbox[1]).stripped[:1].islower()):
+                continue
+            qualified.append(off)
+        if len(qualified)==1 and line.bbox not in proved[raw.pno]:
+            proved[raw.pno].append(line.bbox)
     paired=[]
     for row in candidates:
         raw,line,side,letters,keyed,interior,offset,_=row
@@ -2240,7 +2304,83 @@ def _scan_note_small_block(raw, block, style):
     return small, height
 
 
-def _scan_note_candidates(raw, style):
+def _merged_scan_note_prefix(raw, block, style, prior, pixel_probe):
+    """Source ink, not a punctuation reading, proves a merged footer prefix."""
+    if pixel_probe is None or len(block.lines) != 1:
+        return False
+    spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    if not spans:
+        return False
+    first = spans[0]
+    if (not re.match(r'^[^A-Za-z0-9]+[A-Za-z]', first.text)
+            or not (first.uncertain or first.transcription_uncertain or first.encoding_unresolved)):
+        return False
+    try:
+        proof = pixel_probe.source_raised_prefix(first.bbox)
+    except (AttributeError, ValueError, RuntimeError):
+        return False
+    if not isinstance(proof, dict):
+        return False
+    prefix, lexical = proof.get('prefix_bbox'), proof.get('lexical_bbox')
+    if (not prefix or not lexical or len(prefix) != 4 or len(lexical) != 4
+            or not all(math.isfinite(v) for v in prefix+lexical)):
+        return False
+    # A slanted source line's far-right word can have an earlier top than its
+    # raised opening. Measure clearance against the preceding body at this
+    # actual lexical position, rather than that distant word's scalar box.
+    local = [sp for sp in prior.spans if sp.text.strip()
+             and sp.bbox[0] < lexical[2] and lexical[0] < sp.bbox[2]]
+    return bool(local and lexical[1]-max(sp.bbox[3] for sp in local) >=
+                style.body_size*1.2-.01)
+
+
+def _preceding_damaged_scan_note(block, small, height, style, anchors):
+    """A raised unknown opening precedes an independently owned source note.
+
+    Degree-shaped OCR stays ineligible on its own. Only complete smaller
+    hanging rows, original marker/word alignment and a nearby already owned
+    numeric footer establish this additional territory without reading it.
+    """
+    if len(block.lines) < 2:
+        return False
+    spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    if len(spans) < 2:
+        return False
+    marker, word = spans[:2]
+    label = marker.text.strip()
+    if (not 1 <= len(label) <= 3 or '°' not in label or any(c.isalnum() for c in label)
+            or not (marker.uncertain or marker.transcription_uncertain or marker.encoding_unresolved)
+            or marker.size > small*.75 or not word.text.lstrip()[:1].isalpha()
+            or marker.bbox[1] > word.bbox[1]+small*.2
+            or marker.bbox[3] > word.bbox[3]-small*.2
+            or any(not line.stripped[:1].isalpha()
+                   or line.bbox[0] > word.bbox[0]-small*.5
+                   or abs(line.bbox[0]-block.bbox[0]) > small*.25
+                   for line in block.lines[1:])):
+        return False
+    for anchor in anchors:
+        if not anchor.lines or not 0 <= anchor.bbox[1]-block.bbox[3] <= style.body_size*.5:
+            continue
+        opening = [sp for sp in anchor.lines[0].spans if sp.text.strip()]
+        alpha = _scan_note_words(anchor.lines)
+        if len(opening) < 2 or not alpha:
+            continue
+        first, following = opening[:2]
+        anchor_size = median(sp.size for sp in alpha)
+        baseline = median(sp.bbox[3] for sp in alpha)
+        if (re.fullmatch(r'\d{1,2}[.)]?', first.text.strip())
+                and all(sp.font == 'ocr' for line in anchor.lines for sp in line.spans)
+                and anchor_size <= style.body_size*.9
+                and median(sp.bbox[3]-sp.bbox[1] for sp in alpha) <= style.body_size*.65
+                and first.size <= anchor_size*.75
+                and first.bbox[3] <= baseline-anchor_size*.2
+                and abs(first.bbox[0]-marker.bbox[0]) <= small*.25
+                and abs(following.bbox[0]-word.bbox[0]) <= small*.5):
+            return True
+    return False
+
+
+def _scan_note_candidates(raw, style, pixel_probe=None):
     em = style.body_size
     if (not em or not raw.is_page_scan
             or raw.source_geometry.get('space') != 'reading'):
@@ -2266,7 +2406,8 @@ def _scan_note_candidates(raw, style):
                      else em*(.5 if _close_raised_scan_note(block, small) else .8))
         if (small > median(sp.size for sp in larger)*.9
                 or height > median(sp.bbox[3]-sp.bbox[1] for sp in larger)*.9
-                or block.bbox[1]-prior.bbox[3] < clearance-.01
+                or (block.bbox[1]-prior.bbox[3] < clearance-.01
+                    and not _merged_scan_note_prefix(raw, block, style, prior, pixel_probe))
                 or block.bbox[0] < prior.bbox[0]-em
                 or block.bbox[2] > prior.bbox[2]+em):
             continue
@@ -2491,11 +2632,11 @@ def _pixel_divided_scan_note(raw, block, style, prior, pixel_probe):
                 and ink[3] <= block.bbox[1]-.5)
 
 
-def _detached_scan_note_territories(raw, style, pixel_probe=None):
+def _detached_scan_note_territories(raw, style, pixel_probe=None, note_anchors=()):
     """Retain complete source-proved OCR footers as unnumbered uncertain notes."""
     em = style.body_size
     notes, ownership = [], set()
-    for block, prior, small, height in _scan_note_candidates(raw, style):
+    for block, prior, small, height in _scan_note_candidates(raw, style, pixel_probe):
         if id(block) in ownership:
             continue
         spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
@@ -2514,6 +2655,9 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
         proven = proven or (box in style.scan_note_lane_boxes.get(raw.pno, [])
                            and gap >= em*1.2-.01)
         proven = proven or _pixel_divided_scan_note(raw, block, style, prior, pixel_probe)
+        preceding = (gap >= em*1.2-.01 and
+                     _preceding_damaged_scan_note(block, small, height, style, note_anchors))
+        proven = proven or preceding or _merged_scan_note_prefix(raw, block, style, prior, pixel_probe)
         if not proven:
             if pixel_probe is None or not first.text.lstrip()[:1].isalpha():
                 continue
@@ -2543,6 +2687,9 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
         # Continue only tight, uniformly smaller source blocks in this same
         # terminal column. A new numeral is neither required nor inferred.
         for following in sorted(raw.text_blocks, key=lambda b: b.bbox[1]):
+            if preceding and any(line in anchor.lines for line in following.lines
+                                 for anchor in note_anchors):
+                continue
             if id(following) in ownership or following.bbox[1] < block.bbox[1]:
                 continue
             if not (following.bbox[0] < prior.bbox[2]
@@ -2581,14 +2728,20 @@ def _split_off_notes(raw, style, skel, pixel_probe=None, _detached_pass=True):
     carry their own evidence and do not ask for the corroboration.
     """
     from . import note_evidence
-    unknown = (_detached_scan_note_territories(raw, style, pixel_probe)
-               if _detached_pass else [])
+    if _detached_pass and raw.is_page_scan:
+        # Original-page validation supplies independent anchors before any
+        # unknown territory is removed; a candidate cannot teach its own role.
+        body, notes = _split_off_notes(raw, style, skel, pixel_probe,
+                                      _detached_pass=False)
+        unknown = _detached_scan_note_territories(raw, style, pixel_probe, notes)
+        if not unknown:
+            return body, notes
+    else:
+        unknown = []
     if unknown:
         # Keep the original page available to the older opening validation.
         # Removing real later notes first would let an earlier chart degree
         # become the only apparent numeric opening and lose its veto.
-        body, notes = _split_off_notes(raw, style, skel, pixel_probe,
-                                      _detached_pass=False)
         owned = {id(line) for note in unknown for line in note.lines}
         body = [replace(block, lines=kept, bbox=_lines_bbox(kept, block.bbox))
                 for block in body
