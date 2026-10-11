@@ -1627,7 +1627,7 @@ def _scan_key_white_margin_jpeg(doc, pno, bbox):
 
 
 
-def _figure_crop_margin(data):
+def _figure_crop_margin(data, audit=None):
     """Keep edge ink away from a reader's image boundary, without resampling.
 
     The original decoded crop remains byte-for-byte inside the white frame.
@@ -1637,18 +1637,55 @@ def _figure_crop_margin(data):
     import io
     from PIL import Image, ImageOps
     with Image.open(io.BytesIO(data)) as image:
+        if audit is not None:
+            audit['reading_image_geometry'] = dict(source_pixel_size=list(image.size),
+                packaged_pixel_size=list(image.size), padding=[0,0,0,0])
         ink = image.convert('L').point(lambda value: 255 if value < 240 else 0).getbbox()
         margin = 8
         if ink is None or (ink[0] >= margin and ink[1] >= margin and
                            image.width-ink[2] >= margin and image.height-ink[3] >= margin):
             return data
         padded = ImageOps.expand(image.convert('RGB'), border=margin, fill='white')
+        if audit is not None:
+            audit['reading_image_geometry'].update(packaged_pixel_size=list(padded.size),
+                padding=[margin]*4)
         output = io.BytesIO()
         padded.save(output, format='PNG', optimize=True)
         return output.getvalue()
 
+
+def _source_edge_boxes(book, pno, transform=None):
+    """Literal source glyph extents, including pixels absent from live prose."""
+    boxes = []
+    for row in getattr(book, 'source_inventory', {}).get(pno, {}).get('lines', []):
+        line = row['source']
+        for span in getattr(line, 'spans', ()):
+            if span.text.strip():
+                boxes.append(transform(pno, span.bbox) if transform else span.bbox)
+    return boxes
+
+
+def _source_scan_edges(doc, pno):
+    from .crop_edges import source_scan_edges
+    return source_scan_edges(extract.render_page_jpeg(doc, pno, scale=2, quality=90),
+                             _page_rect(doc, pno))
+
+
+def _retained_source_rect(rect, audits):
+    for audit in audits:
+        if audit.get('action') not in (None, 'trim') or 'retained_pixel_bbox' not in audit:
+            continue
+        x0,y0,x1,y1 = audit['retained_pixel_bbox']
+        width,height = audit['size']
+        return (rect[0]+(rect[2]-rect[0])*x0/width,
+                rect[1]+(rect[3]-rect[1])*y0/height,
+                rect[0]+(rect[2]-rect[0])*x1/width,
+                rect[1]+(rect[3]-rect[1])*y1/height)
+    return tuple(rect)
+
 def _figure_images(chapters, doc, book, package, figure_transform=None, owned_images=(),
-                   runtime_progress=None, required_source_regions=()):
+                   runtime_progress=None, required_source_regions=(),
+                   figure_presentation=None):
     """Crop each figure the fragments referred to; drop the ones we cannot make.
 
     Each crop goes into ``package`` as it is cut (:class:`_Package`); what comes
@@ -1664,6 +1701,10 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
     ``figure_transform`` maps a figure's box from the page's reading space into
     unrotated PDF space before cropping: on a rotated spread the skeleton measured
     in the upright reading space, and the ink is stored sideways.
+
+    ``figure_presentation`` receives crop/probe metadata separately from source
+    ownership. Book.figures participates in canonical source seals and is never
+    mutated while publishing images, including on repeated builds or audits.
     """
     wanted = []
     for chapter in chapters:
@@ -1678,6 +1719,9 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         seen.append(figure)
 
     missing, blanks = [], []
+    scan_edges = {}
+    if figure_presentation is None:
+        figure_presentation = {}
     for ordinal, src in enumerate(wanted, 1):
         match = re.match(r"images/fig_p(\d+)_(\d+)\.jpg$", src)
         if not match or doc is None:
@@ -1691,7 +1735,8 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         if index >= len(page_figures):
             missing.append(src)
             continue
-        figure = page_figures[index]
+        figure = dict(page_figures[index])
+        figure_presentation[src] = figure
         render_doc=doc
         transform=figure_transform
         geometry=figure.get('source_geometry',{})
@@ -1760,13 +1805,29 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         finally:
             if ink_doc is not render_doc:ink_doc.close()
         if data is not None:
+            if not figure.get('full_page') and (geometry.get('space') == 'reading' or
+                    figure.get('found', '').startswith(('scan_', 'ocr_', 'uncertain_scan_'))):
+                from .crop_edges import trim_source_edges
+                if pno not in scan_edges:
+                    scan_edges[pno] = _source_scan_edges(render_doc, pno)
+                data, edge_audit, dropped = trim_source_edges(data, bbox, scan_edges[pno],
+                    _source_edge_boxes(book, pno, transform))
+                if edge_audit:
+                    figure['source_scan_edge'] = edge_audit
+                    figure['reading_bbox'] = list(_retained_source_rect(bbox, edge_audit))
+                if dropped and src not in required_source_regions:
+                    figure['scan_edge_dropped'] = True
+                    blanks.append(src)
+                    continue
             from .crop_edges import trim_scan_borders
             data, trims = trim_scan_borders(data)
             if trims:
                 figure['scan_border_trim'] = trims
+                figure['reading_bbox'] = list(_retained_source_rect(
+                    figure.get('reading_bbox', bbox), trims))
             # Outside the crop's failure handling: a crop the archive cannot take
             # is a failed build, never a figure reported lost from the source.
-            package.image(src, _figure_crop_margin(data))
+            package.image(src, _figure_crop_margin(data, figure))
     return missing, blanks
 
 
@@ -1978,22 +2039,34 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
                 package.image(src, data, store=True)
             else:
                 package.image(src, data)
+        source_edges = None
         def reading_crop(rect, data):
             # Primary artwork and its enlarged inspection must agree. The full
             # original remains pristine; only detached bars in scan crops are
             # trimmed. Alternative-reading evidence keeps its sealed bytes.
             if provenance.get('layer') != 'ocr' and display._native_bitonal() is None:
                 return rect, data, []
-            from .crop_edges import trim_scan_borders
+            nonlocal source_edges
+            from .crop_edges import trim_scan_borders, trim_source_edges
+            if source_edges is None:
+                source_edges = _source_scan_edges(display.query_document(), pno)
+            protected = _source_edge_boxes(book, pno)
+            if provenance.get('layer') != 'ocr':
+                protected = [tuple(display.reading_rect(extract.pymupdf.Rect(box)))
+                             for box in protected]
+            data, edge_audit, dropped = trim_source_edges(data, tuple(rect), source_edges, protected)
+            if dropped:
+                return rect, data, edge_audit
+            rect = extract.pymupdf.Rect(_retained_source_rect(tuple(rect), edge_audit))
             data, trims = trim_scan_borders(data)
             if not trims:
-                return rect, data, []
+                return rect, data, edge_audit
             x0,y0,x1,y1 = trims[0]['retained_pixel_bbox']
             width,height = trims[0]['size']
             retained = extract.pymupdf.Rect(rect.x0+rect.width*x0/width,
                 rect.y0+rect.height*y0/height, rect.x0+rect.width*x1/width,
                 rect.y0+rect.height*y1/height)
-            return retained, data, trims
+            return retained, data, edge_audit + trims
         full = "images/original_p%04d.jpg" % pno
         package_source_image(full, display.source_image(scale=1.5, quality=85,
                                                         lossless_candidate=pno not in native_figures))
@@ -2033,6 +2106,8 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
             reading_rect, data, trims = reading_crop(reading_rect, display.source_image(reading_rect,
                 scale=2 if pno in native_figures else 3,
                 lossless_candidate=pno not in native_figures))
+            if any(t.get('action') == 'drop_scan_carrier' for t in trims):
+                continue
             package_source_image(src, data)
             if trims:
                 rect = display.source_rect(reading_rect) * doc[pno].derotation_matrix
@@ -2054,6 +2129,8 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
             src = "images/original_p%04d_%s.jpg" % (pno, key)
             rect, data, trims = reading_crop(extract.pymupdf.Rect(proof['reading_bbox']),
                 display.source_image(proof['reading_bbox'], lossless_candidate=True))
+            if any(t.get('action') == 'drop_scan_carrier' for t in trims):
+                continue
             package.image(src, data)
             details.append({"id": key, "label": "Original layout and labels", "src": src, **proof})
             if trims:
@@ -2073,6 +2150,8 @@ def _original_evidence(book, page_html, doc, package, figure_transform=None,
                 src = "images/original_p%04d_%s.jpg" % (pno, key)
                 trimmed_tile, data, trims = reading_crop(tile, display.source_image(tile,
                     lossless_candidate=pno not in native_figures))
+                if any(t.get('action') == 'drop_scan_carrier' for t in trims):
+                    continue
                 package_source_image(src, data)
                 details.append({"id": key, "label": "Original detail %d (row order)" % (tile_index + 1),
                     "src": src, "reading_bbox": list(trimmed_tile), "displayed_pdf_bbox": list(display.source_rect(trimmed_tile))})
@@ -2378,11 +2457,13 @@ def build(book, out_path, page_html=None, metadata=None, doc=None,
         if runtime_progress is not None:
             runtime_progress({"kind": "phase", "phase": "figure_crops"})
         figure_fragments = [Chapter(index=0, title="", blocks=list(page_html.values()))]
+        figure_presentation = {}
         missing, blanks = _figure_images(figure_fragments, doc, book, package,
                                          figure_transform=figure_transform,
                                          owned_images=set(package.images)|set(package.aliases),
                                          runtime_progress=runtime_progress,
-                                         required_source_regions=required_source_regions)
+                                         required_source_regions=required_source_regions,
+                                         figure_presentation=figure_presentation)
         if set(required_source_regions).intersection(missing + blanks) or not all(
                 package.aliases.get(src, src) in package.images for src in required_source_regions):
             from .structural_ops import ContractError
@@ -2522,8 +2603,14 @@ def build(book, out_path, page_html=None, metadata=None, doc=None,
 
         payload = _sidecar(book, pages, chapters, images, joins, sidecar, blanks)
         payload['reading_flow'] = reading_flow_audit
+        # Geometry of delivered resources is presentation evidence, not a
+        # change to the immutable source figure records. Resolve image aliases
+        # in keys explicitly: the generic sidecar alias walker changes values.
+        payload['figure_presentation'] = {package.aliases.get(src, src):record
+            for src, record in figure_presentation.items()}
         payload['scan_border_trims'] = [dict(page=f['pno'], bbox=list(f['bbox']),
-            trims=f['scan_border_trim']) for f in book.figures if f.get('scan_border_trim')]
+            trims=f['scan_border_trim']) for f in figure_presentation.values()
+            if f.get('scan_border_trim')]
         if compiled_layouts:
             payload['layout_operations'] = layout_build.report(compiled_layouts)
             bound_notes = payload['layout_operations'].get('note_bindings_applied', 0)
