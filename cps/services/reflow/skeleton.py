@@ -2186,6 +2186,36 @@ def _corroborated_raised_scan_note_openings(block, small):
     return False
 
 
+def _corroborated_numeric_scan_note_openings(block, small):
+    """Repeated aligned source digits corroborate modest physical glyph raise.
+
+    Both openings must independently sit above the median word baseline. This
+    pair-only proof does not lower the single-marker raise requirement, and its
+    caller still requires the ordinary detached-footer body clearance.
+    """
+    openings = []
+    for index, line in enumerate(block.lines):
+        spans = [sp for sp in line.spans if sp.text.strip()]
+        if len(spans) < 2:
+            continue
+        marker, following = spans[:2]
+        if not re.fullmatch(r'\d{1,2}[.)]?', marker.text.strip()):
+            if index == 0:
+                return False
+            continue
+        words = _scan_note_words([line])
+        if (len(words) < 2 or not following.text.lstrip()[:1].isalpha()
+                or marker.size > small*.75
+                or marker.bbox[1] > following.bbox[1]+small*.2
+                or marker.bbox[3] > median(sp.bbox[3] for sp in words)-small*.05):
+            return False
+        if openings and (abs(marker.bbox[0]-openings[0][0].bbox[0]) > small*.25
+                         or abs(following.bbox[0]-openings[0][1].bbox[0]) > small*.25):
+            return False
+        openings.append((marker, following))
+    return len(openings) >= 2
+
+
 def _scan_note_small_block(raw, block, style):
     """Measure OCR words, rather than an outlying line-size scalar."""
     alpha = _scan_note_words(block.lines)
@@ -2203,7 +2233,9 @@ def _scan_note_small_block(raw, block, style):
     if (height > style.body_size*.65
             or (small > style.body_size*.86
                 and not (small <= style.body_size*.90
-                         and _corroborated_raised_scan_note_openings(block, small)))):
+                         and (_corroborated_raised_scan_note_openings(block, small)
+                              or _tight_raised_scan_note(block, small,
+                                  style.body_size, numeric_only=True))))):
         return None
     return small, height
 
@@ -2230,10 +2262,11 @@ def _scan_note_candidates(raw, style):
             continue
         prior = max(above, key=lambda line: line.bbox[3])
         larger = _scan_note_words([prior])
+        clearance = (height*.5 if _tight_raised_scan_note(block, small, em)
+                     else em*(.5 if _close_raised_scan_note(block, small) else .8))
         if (small > median(sp.size for sp in larger)*.9
                 or height > median(sp.bbox[3]-sp.bbox[1] for sp in larger)*.9
-                or block.bbox[1]-prior.bbox[3] < em*(
-                    .5 if _close_raised_scan_note(block, small) else .8)-.01
+                or block.bbox[1]-prior.bbox[3] < clearance-.01
                 or block.bbox[0] < prior.bbox[0]-em
                 or block.bbox[2] > prior.bbox[2]+em):
             continue
@@ -2244,13 +2277,17 @@ def _scan_note_candidates(raw, style):
                and (alpha := _scan_note_words(other.lines))
                and median(sp.size for sp in alpha) >= em*.95
                and any(not _furniture_reason(line, raw, style) for line in other.lines)
+               and not (_tight_raised_scan_note(block, small, em)
+                        and _adjacent_raised_scan_note(raw, other, style,
+                            block, small, height, block.bbox, numeric_only=True))
                for other in raw.text_blocks if other is not block):
             continue
         candidates.append((block, prior, small, height))
     return candidates
 
 
-def _raised_scan_note_opening(block, small, allow_numeric=False):
+def _raised_scan_note_opening(block, small, allow_numeric=False,
+                              numeric_punctuation=False):
     spans = [sp for sp in block.lines[0].spans if sp.text.strip()]
     if len(spans) < 2:
         return False
@@ -2260,10 +2297,33 @@ def _raised_scan_note_opening(block, small, allow_numeric=False):
                       and (first.uncertain or first.transcription_uncertain
                            or first.encoding_unresolved))
     return (1 <= len(marker) <= 3
-            and (uncertain_mark or (allow_numeric and marker.isdecimal()))
+            and (uncertain_mark or (allow_numeric and (marker.isdecimal()
+                 or (numeric_punctuation and re.fullmatch(r'\d{1,2}[.)]', marker)))))
             and first.size <= small*.75 and following.text.lstrip()[:1].isalpha()
             and first.bbox[1] <= following.bbox[1]+small*.2
             and first.bbox[3] <= following.bbox[3]-small*.2)
+
+
+def _tight_raised_scan_note(block, small, body_size, numeric_only=False):
+    """A raised opening and smaller hanging rows prove tight footer clearance.
+
+    Literal digits, a year-only tail and a hanging ampersand are source shapes,
+    not corrected readings or note numbers. Unmarked footer policy is unchanged.
+    """
+    if (len(block.lines) < 2 or not _raised_scan_note_opening(
+            block, small, allow_numeric=True, numeric_punctuation=True)):
+        return False
+    opening = [sp for sp in block.lines[0].spans if sp.text.strip()]
+    if numeric_only and not re.fullmatch(r'\d{1,2}[.)]?', opening[0].text.strip()):
+        return False
+    for line in block.lines[1:]:
+        words = [sp for sp in line.spans if any(c.isalnum() for c in sp.text)]
+        if (not words or line.bbox[0] > opening[1].bbox[0]-small*.5
+                or abs(line.bbox[0]-block.bbox[0]) > small*.25
+                or median(sp.size for sp in words) > body_size*.90
+                or median(sp.bbox[3]-sp.bbox[1] for sp in words) > body_size*.65):
+            return False
+    return True
 
 
 def _close_raised_scan_note(block, small):
@@ -2304,7 +2364,8 @@ def _short_scan_note_tail(raw, block, style, preceding):
     return True
 
 
-def _adjacent_raised_scan_note(raw, block, style, seed, small, height, box):
+def _adjacent_raised_scan_note(raw, block, style, seed, small, height, box,
+                              numeric_only=False):
     """An aligned damaged opening continues an independently proved footer.
 
     A degree-shaped OCR token alone remains ineligible. Here the original
@@ -2330,12 +2391,19 @@ def _adjacent_raised_scan_note(raw, block, style, seed, small, height, box):
     label = first.text.strip()
     measured = median(sp.size for sp in alpha)
     glyph_height = median(sp.bbox[3]-sp.bbox[1] for sp in alpha)
-    return (1 <= len(label) <= 3 and not any(c.isalnum() for c in label)
-            and (first.uncertain or first.transcription_uncertain
-                 or first.encoding_unresolved)
+    marker = (bool(re.fullmatch(r'\d{1,2}[.)]?', label)) if numeric_only
+              else (1 <= len(label) <= 3 and not any(c.isalnum() for c in label)
+                    and (first.uncertain or first.transcription_uncertain
+                         or first.encoding_unresolved)))
+    # In an already proved footer, an aligned raised literal digit and smaller
+    # physical ink can overcome a body-sized OCR font estimate. The default
+    # damaged-symbol policy and its stricter typography remain unchanged.
+    font_limit = min(em, small*1.35) if numeric_only else min(em*.95, small*1.25)
+    height_limit = min(em*.75, height*1.35) if numeric_only else min(em*.7, height*1.25)
+    return (marker
             and following.text.lstrip()[:1].isalpha()
-            and measured <= min(em*.95, small*1.25)
-            and glyph_height <= min(em*.7, height*1.25)
+            and measured <= font_limit
+            and glyph_height <= height_limit
             and first.size <= measured*.75
             and first.bbox[1] <= following.bbox[1]+measured*.2
             and first.bbox[3] <= following.bbox[3]-measured*.2
@@ -2397,8 +2465,13 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
         first, box = spans[0], block.bbox
         gap = box[1]-prior.bbox[3]
         proven = (gap >= em*1.2-.01 and _raised_scan_note_opening(block, small))
-        close_raised = _close_raised_scan_note(block, small)
+        proven = proven or (gap >= em*1.2-.01
+                            and _corroborated_numeric_scan_note_openings(block, small))
+        close_raised = (_close_raised_scan_note(block, small)
+                        or _tight_raised_scan_note(block, small, em))
         proven = proven or (close_raised and gap >= em*.5-.01)
+        proven = proven or (_tight_raised_scan_note(block, small, em)
+                            and gap >= height*.5-.01)
         proven = proven or (box in style.scan_note_lane_boxes.get(raw.pno, [])
                            and gap >= em*1.2-.01)
         if not proven:
@@ -2442,7 +2515,10 @@ def _detached_scan_note_territories(raw, style, pixel_probe=None):
                             or (close_raised and _short_scan_note_tail(
                                 raw, following, style, lines[-1]))
                             or (close_raised and _adjacent_raised_scan_note(
-                                raw, following, style, block, small, height, box)))):
+                                raw, following, style, block, small, height, box))
+                            or (close_raised and _adjacent_raised_scan_note(
+                                raw, following, style, block, small, height, box,
+                                numeric_only=True)))):
                 break
             lines.extend(following.lines)
             ownership.add(id(following))
