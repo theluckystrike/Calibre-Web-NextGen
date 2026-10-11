@@ -59,3 +59,25 @@ def test_isolated_note_padding_stops_halfway_before_detached_neighboring_source_
     element=book.pages[0][next(iter(contexts))]
     assert body.bbox[3]<element.bbox[1]<raw.blocks[1].bbox[1]
     assert element.bbox[3]>raw.blocks[1].bbox[3]
+
+
+@pytest.mark.parametrize('neighbor_kind',['note','body','caption','artwork'])
+def test_proven_note_survives_partial_padding_overlap_only_with_another_proven_note(neighbor_kind):
+    raw,kept,notes,sk,candidates=prepared()
+    box=(40,359.75,220,369.25)
+    neighbor=extract.Line([extract.Span('10 Another source line.',9,'ocr',0,box)],box)
+    raw.blocks.append(extract.Block(2,box,[neighbor]))
+    if neighbor_kind=='note':notes.append(skeleton.Region('note',lines=[neighbor],number=10,bbox=box))
+    else:kept.append((raw.blocks[-1],[neighbor]))
+    before=asdict(raw)
+    kept,notes=skeleton._preserve_uncertain_ocr_regions(raw,kept,notes,sk,None,candidates)
+    sk.regions.extend(skeleton.Region(neighbor_kind if neighbor in group else 'body',lines=group,bbox=block.bbox)
+                      for block,group in kept)
+    sk.regions.extend(notes)
+    book=assemble.assemble([sk],skeleton.BookStyle(body_size=12),[raw])
+    assert book.conservation.ok and asdict(raw)==before
+    context=assemble.source_note_context_figures(book,0)
+    assert bool(context)==(neighbor_kind=='note')
+    if context:
+        element=book.pages[0][next(iter(context))]
+        assert element.bbox[3]>box[1] and element.bbox[3]<box[3]

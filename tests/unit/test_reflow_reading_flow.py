@@ -47,6 +47,36 @@ def test_proven_midpage_footnotes_leave_the_unfinished_body_sentence():
     assert len([ln for b in body for ln in b.lines])+sum(len(n.lines) for n in notes)==5
 
 
+@pytest.mark.parametrize('boundary',[None,'word_spans','no_rule','large_rule','body_size','body_below','word_opening'])
+def test_merged_ocr_note_opening_needs_a_printed_divider_and_stays_unnumbered(boundary):
+    raw=opaque_page_fixture()
+    opening=raw.blocks[3].lines[0]
+    # The PDF's OCR says 167; geometry cannot establish the printed 157.
+    opening.spans=[extract.Span('167 Original printed footnote.',9,'ocr',0,opening.bbox)]
+    if boundary=='word_spans':
+        opening.spans=[extract.Span(text,9,'ocr',0,opening.bbox)
+                       for text in ('167',' ','Original printed footnote.')]
+    if boundary=='body_size':opening.spans[0].size=11
+    if boundary=='word_opening':opening.spans[0].text='This is a smaller quotation.'
+    if boundary=='body_below':raw.blocks[-1].lines[0].spans[0].size=11
+    class Probe:
+        def ink_bounds(self,box):
+            return None if boundary=='no_rule' else ((60,120,300,143) if boundary=='large_rule' else (60,136,130,138))
+    regions=skeleton.opaque_page_regions(raw,skeleton.BookStyle(body_size=11),Probe())
+    assert any(r.reason=='ocr_uncertain_note' for r in regions)==(boundary in (None,'word_spans'))
+    if boundary not in (None,'word_spans'):return
+    body,notes=skeleton._split_off_notes(raw,skeleton.BookStyle(body_size=11),skeleton.PageSkeleton(0,420,600),Probe())
+    assert notes and all(n.number is None for n in notes)
+    assert notes[0].reason=='pixel_note_territory'
+    sk=skeleton.PageSkeleton(0,420,600,is_scan=True,regions=[
+        skeleton.Region('body',lines=b.lines,bbox=b.bbox) for b in body]+notes)
+    book=assemble.assemble([sk],skeleton.BookStyle(body_size=11),[raw])
+    assert book.conservation.ok and book.notes[0].uses_source_image
+    html=build_epub.page_fragment(book,0)
+    assert '167' not in html and '157' not in html
+    assert '<aside class="footnote"' in html and '<img' in html
+
+
 @pytest.mark.parametrize('ink,notes', [((60,136,130,138),True),
                                       (None,False),((60,120,300,143),False)])
 def test_untrusted_page_pixels_separate_only_proven_note_territory(ink,notes):

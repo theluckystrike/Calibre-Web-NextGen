@@ -1169,9 +1169,17 @@ def opaque_page_regions(raw, style, pixel_probe=None):
             above, below = prose[:i], prose[i:]
             spans = [s for s in opening.spans if s.text.strip()]
             em, small = size(above), size(below)
-            if (len(above) < 2 or len(spans) < 2 or not em or not small
-                    or not re.fullmatch(r"[1-9]\d{0,2}|[*†‡'’]", spans[0].text.strip())
-                    or spans[0].size > small*.75 or small > em*.9
+            raised = (len(spans) >= 2
+                      and re.fullmatch(r"[1-9]\d{0,2}|[*†‡'’]", spans[0].text.strip())
+                      and spans[0].size <= small*.75)
+            # OCR can merge the raised marker into the note's first word span.
+            # Its literal numeric opening identifies a candidate territory only;
+            # the smaller type, detached gap and painted rule must still prove it.
+            merged = (bool(spans) and re.match(r"[1-9]\d{0,2}\s+\S", opening.stripped)
+                      and spans[0].size > small*.75
+                      and small <= em*.85)
+            if (len(above) < 2 or not em or not small or not (raised or merged)
+                    or small > em*.9
                     or any(size([ln]) > em*.95 for ln in below)):
                 continue
             bottom = max(ln.bbox[3] for ln in above)
@@ -1922,6 +1930,10 @@ def _preserve_uncertain_ocr_regions(raw, kept_blocks, note_regions, skel, cover,
                         b=line.bbox
                         if not (b[0]<proposed[2] and proposed[0]<b[2]
                                 and b[1]<proposed[3] and proposed[1]<b[3]):continue
+                        # Adjacent notes already have independent source roles.
+                        # Their antialiased edges can overlap this padding without
+                        # introducing prose or changing either note's reading.
+                        if id(line) in note_owned:continue
                         # Only wholly detached source lines can bound padding.
                         # A collision with the note's own box is not resolvable.
                         above=block.bbox[1]-b[3]
@@ -2122,8 +2134,20 @@ def _split_off_notes(raw, style, skel, pixel_probe=None):
                 if kept:
                     body.append(extract.Block(block.number, _lines_bbox(kept, block.bbox), kept))
                 if owned:
-                    notes.extend(_notes_in_block(extract.Block(
-                        block.number, _lines_bbox(owned, block.bbox), owned), notes))
+                    spans = [s for s in owned[0].spans if s.text.strip()]
+                    merged = (bool(spans) and re.match(
+                        r"[1-9]\d{0,2}\s+\S", owned[0].stripped)
+                        and spans[0].size > owned[0].size*.75)
+                    if merged:
+                        # Divider evidence proves where this note lives, not the
+                        # OCR digit. Retain pixels in the notes lane without
+                        # inventing a numeric callout or admitting its transcript.
+                        notes.append(Region('note', lines=owned, number=None,
+                            bbox=_lines_bbox(owned, block.bbox), uncertain=True,
+                            reason='pixel_note_territory'))
+                    else:
+                        notes.extend(_notes_in_block(extract.Block(
+                            block.number, _lines_bbox(owned, block.bbox), owned), notes))
             return body, notes
     pixel_note = note_evidence.pixel_separated_note(raw,style.body_size,pixel_probe)
     if pixel_note is not None:

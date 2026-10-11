@@ -572,12 +572,19 @@ def source_note_context_figures(book, pno):
             art=[r for r in inventory['regions'] if r['suggested_kind']=='artwork'
                  and r['reason']=='ocr_uncertain_note' and tuple(r['bbox'])==box]
             if len(art)!=1 or not ids or set(art[0]['line_ids'])!=ids:continue
-            # A padded note crop cannot acquire nearby body text or another
-            # asset merely because its original line owned a note role.
+            # Padding may touch the edge of another independently proven note.
+            # Body/caption ownership or unproved artwork still vetoes it.
             touched=set()
             for row in inventory['lines']:
                 b=row['source'].bbox
                 if b[0]<box[2] and box[0]<b[2] and b[1]<box[3] and box[1]<b[3]:
+                    if row['id'] not in ids:
+                        memberships=[r for r in inventory['regions'] if row['id'] in r['line_ids']]
+                        if (len(memberships)==1 and
+                                (memberships[0]['suggested_kind']=='note' or
+                                 (memberships[0]['suggested_kind']=='artwork' and
+                                  memberships[0]['reason']=='ocr_uncertain_note'))):continue
+                        break
                     if not (box[0]<=b[0] and box[1]<=b[1] and b[2]<=box[2] and b[3]<=box[3]):break
                     touched.add(row['id'])
             else:
@@ -1908,7 +1915,8 @@ def assemble(skeletons, style, raw_pages=None):
                                        uncertain=bool(region.uncertain),
                                        bbox=region.bbox,
                                        continued_from=region.continued_from,
-                                       source_layout=not skel.is_scan and _native_note_grid(region),
+                                       source_layout=(region.reason=='pixel_note_territory' or
+                                                      (not skel.is_scan and _native_note_grid(region))),
                                        glyph_fallback=any((not skel.is_scan and getattr(sp,"encoding_unresolved",False)) or getattr(sp,"transcription_uncertain",False) for ln in region.lines for sp in ln.spans)))
                 if book.notes[-1].glyph_fallback and not book.notes[-1].source_layout:
                     from .native_text import note_glyph_runs
