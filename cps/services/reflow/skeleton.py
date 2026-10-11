@@ -1886,10 +1886,12 @@ def _preserve_tracked_native_lines(raw, kept_blocks, skel):
 def _preserve_uncertain_ocr_regions(raw, kept_blocks, note_regions, skel, cover, candidates):
     from .assemble import HYPHENS
     regions = []
+    # OCR uncertainty changes the representation of body text, not an already
+    # proven source role. Reclaiming a margin row here would put a running head
+    # back into the reading flow after the furniture pass had removed it.
     claimed = {id(line) for region in skel.regions
                if region.reason in ('uncertain_aligned_scan_list', 'source_scan_grid') or
-                  (region.kind=='furniture' and region.reason in
-                   ('sequence_folio', 'repeated_scan_spread_head'))
+                  region.kind=='furniture'
                for line in region.lines}
     claimed.update(id(line) for region in candidates
                    if region.reason == 'source_scan_grid'
@@ -2533,6 +2535,13 @@ def _furniture_reason(line, raw, style, top_y=None):
         return "local_running_folio"
     if line.bbox in getattr(style, 'repeated_head_boxes', {}).get(raw.pno, ()):
         return 'repeated_detached_head'
+    # A disputed isolated digit can be a raised body marker, even in the
+    # margin band. Its spelling alone does not establish a folio. Measured
+    # sequence/repetition ownership above still proves damaged furniture.
+    if FOLIO.match(line.stripped) and (line.transcription_uncertain or any(
+            sp.uncertain or sp.transcription_uncertain or sp.encoding_unresolved
+            for sp in line.spans if sp.text.strip())):
+        return None
     y0, y1 = line.bbox[1], line.bbox[3]
     in_head = y1 <= raw.height * HEADER_BAND
     in_foot = y0 >= raw.height * FOOTER_BAND
