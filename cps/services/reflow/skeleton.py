@@ -1145,6 +1145,44 @@ def _complete_captioned_scan_top(raw, skel, pixel_probe):
             figure.bbox = (x0,max(top,ink[1]-2),x1,y1)
 
 
+def split_scan_note_columns(raw, style):
+    """Separate source spans when OCR joins a spread note to another column.
+
+    Keep every literal span and its measured box. Only a raised short opening
+    in the lower scan margin qualifies; a large measured horizontal gap, not
+    a word reading, separates the note from a neighboring caption or label.
+    Returning a new source page lets source inventory account for each fragment.
+    """
+    if (not raw.is_page_scan or getattr(raw,'source_geometry',{}).get('space')!='reading'
+            or raw.width < raw.height*1.2 or not style.body_size):
+        return raw
+    blocks=[];changed=False
+    for block in raw.blocks:
+        groups=[]
+        for line in block.lines:
+            spans=[s for s in line.spans if s.text.strip()]
+            eligible=(line.bbox[1]>=raw.height*.8 and line.bbox[2]-line.bbox[0]>=raw.width*.5
+                and len(spans)>=2 and len(spans[0].text.strip())<=3
+                and spans[0].size<=style.body_size*.65
+                and spans[1].text.lstrip()[:1].isalpha())
+            parts=[[]]
+            for span in line.spans:
+                if eligible and parts[-1] and span.bbox[0]-max(s.bbox[2] for s in parts[-1])>=raw.width*.15:
+                    parts.append([])
+                parts[-1].append(span)
+            if len(parts)==1:
+                groups.append([line]);continue
+            changed=True
+            for part in parts:
+                box=(min(s.bbox[0] for s in part),min(s.bbox[1] for s in part),
+                     max(s.bbox[2] for s in part),max(s.bbox[3] for s in part))
+                groups.append([replace(line,spans=part,bbox=box)])
+        if any(len(group)==1 and group[0] not in block.lines for group in groups):
+            blocks.extend(replace(block,lines=group,bbox=_lines_bbox(group,block.bbox)) for group in groups)
+        else:blocks.append(block)
+    return replace(raw,blocks=blocks) if changed else raw
+
+
 def opaque_page_regions(raw, style, pixel_probe=None):
     """Separate proven page furniture/notes without trusting their words.
 
@@ -1178,7 +1216,15 @@ def opaque_page_regions(raw, style, pixel_probe=None):
             merged = (bool(spans) and re.match(r"[1-9]\d{0,2}\s+\S", opening.stripped)
                       and spans[0].size > small*.75
                       and small <= em*.85)
-            if (len(above) < 2 or not em or not small or not (raised or merged)
+            # A note continuing from the preceding page can begin with an
+            # ordinary name or word. A later independently raised note opening
+            # anchors that smaller territory; a printed continuation rule must
+            # independently separate it from the larger body above.
+            continuation = (not raised and not merged and bool(spans)
+                and any(len(parts := [s for s in ln.spans if s.text.strip()]) >= 2
+                    and re.fullmatch(r"[1-9]\d{0,2}|[*†‡'’]", parts[0].text.strip())
+                    and parts[0].size <= size([ln])*.75 for ln in below[1:]))
+            if (len(above) < 2 or not em or not small or not (raised or merged or continuation)
                     or small > em*.9
                     or any(size([ln]) > em*.95 for ln in below)):
                 continue
@@ -1186,7 +1232,7 @@ def opaque_page_regions(raw, style, pixel_probe=None):
             top = min(ln.bbox[1] for ln in below)
             left = min(ln.bbox[0] for ln in above)
             right = max(ln.bbox[2] for ln in above)
-            if (top-bottom < em*1.5 or right-left < em*12
+            if (top-bottom < em or right-left < em*12
                     or any(ln.bbox[0] < left-em or ln.bbox[2] > right+em for ln in below)):
                 continue
             # Stay outside the glyph boxes. A short footnote rule need not be
@@ -1196,8 +1242,10 @@ def opaque_page_regions(raw, style, pixel_probe=None):
                 ink = bounds((left-em, bottom+.5, right+em, top-.5))
             except (AttributeError, ValueError, RuntimeError):
                 continue
+            width = right-left
             if (ink and ink[3]-ink[1] <= em*.3
-                    and (right-left)*.18 <= ink[2]-ink[0] <= (right-left)*.8
+                    and width*.18 <= ink[2]-ink[0]
+                    and ink[2]-ink[0] <= width*(1.08 if continuation else .85)
                     and abs(ink[0]-left) <= em
                     and ink[1]-bottom >= em*.5 and top-ink[3] >= .5):
                 candidates.append((above, below, (bottom+ink[1])/2))
@@ -2245,6 +2293,36 @@ def _split_off_notes(raw, style, skel, pixel_probe=None):
         bi, pos = start
         body.extend(eligible[:bi])
         first = eligible[bi]
+        preceding_measure=[ln for block in raw.text_blocks for ln in block.lines
+            if ln.bbox[3]<=first.lines[pos].bbox[1] and ln.size>=style.body_size*.95
+            and ln.bbox[2]-ln.bbox[0]>=style.body_size*12
+            and ln.bbox[0]<first.bbox[2] and first.bbox[0]<ln.bbox[2]]
+        measure=(max(preceding_measure,key=lambda ln:ln.bbox[3]).bbox
+                 if preceding_measure else first.bbox)
+        if pos and _opening_strength(first.lines[pos], first.size)=='raised':
+            label=next(s for s in first.lines[pos].spans if s.text.strip())
+            prefix=first.lines[:pos]
+            damaged=[]
+            for line in prefix:
+                parts=[s for s in line.spans if s.text.strip()]
+                damaged.append(bool(len(parts)>=2 and len(parts[0].text.strip())<=3
+                    and not parts[0].text.strip().isalnum()
+                    and parts[0].size<=line.size*.85 and line.size<=style.body_size*.85
+                    and abs(parts[0].bbox[0]-label.bbox[0])<=style.body_size*.5
+                    and parts[1].text.lstrip()[:1].isalpha()))
+            above=[ln for block in raw.text_blocks for ln in block.lines
+                if ln.bbox[3]<=prefix[0].bbox[1] and ln not in prefix
+                and ln.bbox[0]<first.bbox[2] and first.bbox[0]<ln.bbox[2]
+                and ln.size>=style.body_size*.95]
+            if (all(damaged) and above
+                    and prefix[0].bbox[1]-max(ln.bbox[3] for ln in above)>=style.body_size
+                    and first.lines[pos].bbox[1]-prefix[-1].bbox[3]<=style.body_size):
+                # The raised neighboring note and detached smaller source zone
+                # establish ownership. The damaged opening remains unnumbered.
+                notes.append(Region('note',lines=prefix,number=None,uncertain=True,
+                    bbox=_lines_bbox(prefix,first.bbox),reason='damaged_note_label'))
+                first=replace(first,lines=first.lines[pos:],bbox=_lines_bbox(first.lines[pos:],first.bbox))
+                pos=0
         if pos:
             # The zone opens mid-block: the lines above the first number are
             # body the false opening would have swallowed with it.
@@ -2259,6 +2337,10 @@ def _split_off_notes(raw, style, skel, pixel_probe=None):
         first = keep_adjacent_captions(first, first.lines[0].bbox)
         notes.extend(_notes_in_block(first, notes))
         for blk in eligible[bi + 1:]:
+            # A neighboring page's diagram label/caption does not become a
+            # continuation merely because its baseline falls below this note.
+            if blk.bbox[0]>=measure[2] or blk.bbox[2]<=measure[0]:
+                body.append(blk);continue
             blk = keep_adjacent_captions(blk, notes[-1].bbox)
             if blk is not None:
                 notes.extend(_notes_in_block(blk, notes, distinct_opening=id(blk) in damaged_openings))

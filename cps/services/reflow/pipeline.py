@@ -356,6 +356,13 @@ def run(doc, client=None, ledger=None, cache=None, page_numbers=None,
     style = skeleton.book_style(raw_pages,
                                outline if skeleton.outline_is_useful(outline) else None)
     result.style = style
+    # Preserve literal OCR spans while separating footer notes accidentally
+    # joined across a rotated spread's gutter. Inventory captures these measured
+    # fragments as source units before any note/body classification takes place.
+    raw_pages = [skeleton.split_scan_note_columns(raw, style) for raw in raw_pages]
+    result.raw_pages = raw_pages
+    if result.recovery is not None:
+        result.recovery.pages = raw_pages
     trusted = result.assessment.layer_is_trusted if result.assessment else True
     def pixel_document(raw):
         geometry=getattr(raw,'source_geometry',{})
