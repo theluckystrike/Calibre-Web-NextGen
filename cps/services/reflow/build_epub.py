@@ -1768,7 +1768,36 @@ def _source_furniture_pixel_boxes(book, pno, figure):
     inventory = getattr(book, 'source_inventory', {}).get(pno, {})
     geometry = inventory.get('source_geometry', {})
     rect = geometry.get('page_rect', ())
-    if (figure.get('found') not in ('scan_figure_band', 'scan_figure_side')
+    eligible = figure.get('found') in ('scan_figure_band', 'scan_figure_side')
+    if figure.get('found') == 'ocr_uncertain_region':
+        # An uncertain crop may still be an independently established chart.
+        # Match its canonical region and require both its owned caption and
+        # contained source lettering; uncertain prose alone proves no artwork.
+        rows = {row['id'] for row in inventory.get('lines', ())}
+        carriers = [region for region in inventory.get('regions', ())
+                    if region.get('suggested_kind') == 'figure'
+                    and region.get('reason') == figure.get('found')
+                    and region.get('geometry_status') == 'valid'
+                    and tuple(region.get('bbox', ())) == tuple(figure.get('bbox', ()))]
+        if len(carriers) == 1:
+            carrier = carriers[0]
+            captions = carrier.get('caption_line_ids', ())
+            owners = {owner['line_id']: owner for owner in inventory.get('ownership', ())}
+            box = carrier['bbox']
+            lettering = [region for region in inventory.get('regions', ())
+                         if region.get('suggested_kind') == 'artwork'
+                         and region.get('reason') == 'figure_lettering'
+                         and region.get('geometry_status') == 'valid'
+                         and region.get('line_ids')
+                         and all(line_id in rows for line_id in region['line_ids'])
+                         and region.get('bbox')
+                         and box[0] <= region['bbox'][0] < region['bbox'][2] <= box[2]
+                         and box[1] <= region['bbox'][1] < region['bbox'][3] <= box[3]]
+            eligible = bool(lettering and captions and all(
+                line_id in rows and owners.get(line_id, {}).get('representation') == 'text'
+                and owners.get(line_id, {}).get('owner_id') == carrier['id']
+                for line_id in captions))
+    if (not eligible
             or figure.get('full_page')
             or figure.get('source_geometry', {}).get('space') != 'reading'
             or geometry.get('space') != 'reading' or len(rect) != 4
@@ -1778,6 +1807,7 @@ def _source_furniture_pixel_boxes(book, pno, figure):
                        for image in inventory.get('raw_images', ()))):
         return [], []
     rows = {row['id']: row['source'] for row in inventory.get('lines', ())}
+    carrier_box = figure.get('bbox', ())
     proved = set()
     for region in inventory.get('regions', ()):
         box, ids = region.get('bbox'), region.get('line_ids', ())
@@ -1786,6 +1816,10 @@ def _source_furniture_pixel_boxes(book, pno, figure):
                 or region.get('geometry_status') != 'valid' or not box or not ids
                 or box[1] < rect[1] or box[3] > rect[1]+(rect[3]-rect[1])*.12
                 or any(line_id not in rows for line_id in ids)):
+            continue
+        if (len(carrier_box) != 4 or box[0] >= carrier_box[2]
+                or box[2] <= carrier_box[0] or box[1] >= carrier_box[3]
+                or box[3] <= carrier_box[1]):
             continue
         if any(sum(char.isalpha() for char in rows[line_id].text) < 6 for line_id in ids):
             continue

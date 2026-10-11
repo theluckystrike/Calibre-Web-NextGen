@@ -547,6 +547,7 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
     """
     candidates = []
     measured = {}
+    small_margin_rows = []
     for raw in raw_pages:
         if not raw.is_page_scan or raw.width < raw.height * 1.2:
             continue
@@ -600,6 +601,46 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
             keyed = any(len({round(key.bbox[1]/height) for key in keys
                              if abs(key.bbox[0]-anchor.bbox[0]) <= raw.width*.02}) >= 3
                         for anchor in keys)
+            # OCR can split a running title from its disputed outer folio, or
+            # split a damaged opening across several spans. Establish the
+            # complete physical row before requiring a literal numeric edge.
+            # These small rows require independent title/placement recurrence;
+            # no isolated disputed mark qualifies from its spelling.
+            row = [line for line in members if
+                   abs((line.bbox[1]+line.bbox[3]-first.bbox[1]-first.bbox[3])/2)
+                   <= height*.5]
+            row = sorted(row, key=lambda line: line.bbox[0])
+            row_spans = [span for line in row for span in line.spans if span.text.strip()]
+            row_text = ' '.join(line.stripped for line in row)
+            row_letters = ''.join(char for char in row_text if char.isalpha())
+            row_box = (min(line.bbox[0] for line in row),
+                       min(line.bbox[1] for line in row),
+                       max(line.bbox[2] for line in row),
+                       max(line.bbox[3] for line in row))
+            row_sizes = [span.size for span in row_spans for char in span.text if char.isalpha()]
+            after_row = [line for line in members if line not in row]
+            if (not keyed and len(row_letters) >= 6
+                    and len(row_text) <= BAND_TEXT_MAX
+                    and row_box[3] <= raw.height*HEADER_BAND
+                    and row_box[3]-row_box[1] <= height*.8
+                    and row_box[2]-row_box[0] <= raw.width*.32
+                    and (row_box[0] <= raw.width*.12 if side == 0
+                         else row_box[2] >= raw.width*.88)
+                    and row_sizes and median(row_sizes) <= height*.75
+                    and sum(char.isupper() for char in row_letters) >= len(row_letters)*.65
+                    and any(span.uncertain or span.transcription_uncertain
+                            or span.encoding_unresolved for span in row_spans)
+                    and not any(any(char.islower() for char in span.text) and not (
+                        span.uncertain or span.transcription_uncertain
+                        or span.encoding_unresolved) for span in row_spans)
+                    and not CAPTION_LINE.match(row_text) and '°' not in row_text
+                    and after_row
+                    and min(line.bbox[1] for line in after_row)-row_box[3] >= (row_box[3]-row_box[1])*.5
+                    and all(height*.3 <= right.bbox[0]-left.bbox[2] <= height*4
+                            for left,right in zip(row,row[1:]))
+                    and not any(line.bbox in (table_labels or {}).get(raw.pno, ()) for line in row)):
+                small_margin_rows.append((raw, side, row, row_box,
+                                          re.sub(r'[^a-z]', '', row_text.lower())))
             outer_alignment = min(abs(first.bbox[0]-min(line.bbox[0] for line in remaining)),
                                   abs(first.bbox[2]-max(line.bbox[2] for line in remaining)))
             alignments = [abs(first.bbox[0]-x0), abs(first.bbox[2]-x1)]
@@ -780,6 +821,91 @@ def _repeated_scan_spread_heads(raw_pages, *, table_labels=None):
                                                     autojunk=False).ratio()>=.55):
                             boxes=table_labels.setdefault(other.pno,[])
                             if candidate.bbox not in boxes:boxes.append(candidate.bbox)
+    # A chart can replace one panel of an otherwise established spread. It
+    # cannot teach a prose template, but its same-band title/edge row can match
+    # two independently measured prose spreads and a three-leaf repeated title.
+    margin_targets = []
+    for raw in raw_pages:
+        if not raw.is_page_scan or raw.width < raw.height*1.2:
+            continue
+        lines = [line for block in raw.text_blocks for line in block.lines if line.stripped]
+        prose = [line for line in lines if len(line.stripped.split()) >= 6
+                 and raw.width*.25 <= line.bbox[2]-line.bbox[0] <= raw.width*.45
+                 and raw.height*.05 < line.bbox[3] < raw.height*.85]
+        if len(prose) < 8 or any(line.bbox[0] < raw.width*.48
+                                and line.bbox[2] > raw.width*.52 for line in lines):
+            continue
+        alphabetic_sizes = [span.size for line in prose for span in line.spans
+                            for word in span.text.split() if any(char.isalpha() for char in word)]
+        if not alphabetic_sizes:
+            continue
+        em = median(alphabetic_sizes)
+        for side in (0,1):
+            members = [line for line in lines if
+                       ((line.bbox[0]+line.bbox[2])/2 < raw.width*.5) == (side == 0)]
+            if not members:
+                continue
+            first = min(members,key=lambda line:line.bbox[1])
+            row = sorted([line for line in members if
+                          abs((line.bbox[1]+line.bbox[3]-first.bbox[1]-first.bbox[3])/2)
+                          <= em*.5],key=lambda line:line.bbox[0])
+            spans = [span for line in row for span in line.spans if span.text.strip()]
+            text = ' '.join(line.stripped for line in row)
+            letters = ''.join(char for char in text if char.isalpha())
+            box = (min(line.bbox[0] for line in row),min(line.bbox[1] for line in row),
+                   max(line.bbox[2] for line in row),max(line.bbox[3] for line in row))
+            sizes = [span.size for span in spans for char in span.text if char.isalpha()]
+            following = [line for line in members if line not in row]
+            if (len(letters) < 6 or len(text) > BAND_TEXT_MAX or not sizes
+                    or box[3] > raw.height*HEADER_BAND or box[3]-box[1] > em*.8
+                    or box[2]-box[0] > raw.width*.32 or median(sizes) > em*.75
+                    or (box[0] > raw.width*.12 if side == 0 else box[2] < raw.width*.88)
+                    or sum(char.isupper() for char in letters) < len(letters)*.65
+                    or not any(span.uncertain or span.transcription_uncertain
+                               or span.encoding_unresolved for span in spans)
+                    or any(any(char.islower() for char in span.text) and not (
+                        span.uncertain or span.transcription_uncertain
+                        or span.encoding_unresolved) for span in spans)
+                    or CAPTION_LINE.match(text) or '°' in text or not following
+                    or min(line.bbox[1] for line in following)-box[3] < (box[3]-box[1])*.5
+                    or any(not em*.3 <= right.bbox[0]-left.bbox[2] <= em*4
+                           for left,right in zip(row,row[1:]))
+                    or any(line.bbox in (table_labels or {}).get(raw.pno, ()) for line in row)):
+                continue
+            margin_targets.append((raw,side,row,box,re.sub(r'[^a-z]', '',text.lower())))
+    for raw,side,row,box,letters in margin_targets:
+        def matches(other,panel,parts,other_box,text):
+            return (panel == side and abs(other.pno-raw.pno) <= 12
+                    and abs(other_box[1]/other.height-box[1]/raw.height) <= .02
+                    and abs(other_box[0]/other.width-box[0]/raw.width) <= .025
+                    and abs((other_box[2]-other_box[0])/other.width-
+                            (box[2]-box[0])/raw.width) <= .045
+                    and SequenceMatcher(None,letters,text,autojunk=False).ratio() >= .55
+                    and not any(line.bbox in (table_labels or {}).get(other.pno, ()) for line in parts))
+        peers = {other.pno for other,panel,parts,other_box,text in margin_targets
+                 if matches(other,panel,parts,other_box,text)}
+        teachers = {other.pno for other,panel,parts,other_box,text in small_margin_rows
+                    if matches(other,panel,parts,other_box,text)}
+        leading = _LEADING_PRINTED_FOLIO.fullmatch(' '.join(line.stripped for line in row))
+        trailing = _TRAILING_PRINTED_FOLIO.fullmatch(' '.join(line.stripped for line in row))
+        edge = row[0].spans[0] if side == 0 else row[-1].spans[-1]
+        # Reliable numeric ink cannot override a contrary folio progression.
+        numeric = leading if side == 0 else trailing
+        if numeric and not edge.uncertain:
+            offset = int(numeric[1] if side == 0 else numeric[2])-2*raw.pno-side
+            agreeing = set()
+            for other,panel,parts,other_box,text in small_margin_rows:
+                if not matches(other,panel,parts,other_box,text):
+                    continue
+                printed = ' '.join(line.stripped for line in parts)
+                marker = (_LEADING_PRINTED_FOLIO if side == 0 else _TRAILING_PRINTED_FOLIO).fullmatch(printed)
+                if marker and int(marker[1] if side == 0 else marker[2])-2*other.pno-side == offset:
+                    agreeing.add(other.pno)
+            teachers &= agreeing
+        if len(peers) >= 3 and len(teachers) >= 2:
+            for line in row:
+                if line.bbox not in proved[raw.pno]:
+                    proved[raw.pno].append(line.bbox)
     return dict(proved)
 
 

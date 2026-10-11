@@ -416,6 +416,7 @@ def glyph_html(record, block=False):
 
 
 def package_glyphs(book,page_html,doc,package,should_stop=None):
+    from . import extract
     from .source_display import SourceDisplay
     records={}
     for pno,elements in book.pages.items():
@@ -433,12 +434,23 @@ def package_glyphs(book,page_html,doc,package,should_stop=None):
                 record=note_descriptor(note);records[image_name(record)]=record
     if records and doc is None:raise ValueError('Original PDF required for unmapped source glyphs')
     display=None
+    display_key=None
     for name,record in sorted(records.items(),key=lambda item:item[1]['page']):
         if should_stop and should_stop():
             from .build_epub import BuildCancelled
             raise BuildCancelled('Source glyph rendering cancelled')
-        if display is None or display.pno!=record['page']:
-            display=SourceDisplay(doc,record['page'])
-        rect=display.reading_rect(record['bbox'])
+        geometry = (getattr(book, 'source_inventory', {}).get(record['page'], {})
+                    .get('source_geometry', {}))
+        reading_layout = record.get('reason') == 'layout' and geometry.get('space') == 'reading'
+        provenance = dict(geometry, layer='ocr') if reading_layout else None
+        key = (record['page'], reading_layout)
+        if display is None or display_key != key:
+            display=SourceDisplay(doc,record['page'],provenance)
+            display_key=key
+        # Source-layout notes inherit the measured scan reading frame. Native
+        # glyphs and encoding notes retain their unrotated PDF coordinates,
+        # including when they share a page with a scan-layout note.
+        rect=(extract.pymupdf.Rect(record['bbox']) if reading_layout
+              else display.reading_rect(record['bbox']))
         if rect.is_empty:raise ValueError('Source glyph crop is outside page')
         package.image(name,display.source_image(rect,scale=6,quality=95))
