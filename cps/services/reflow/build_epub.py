@@ -1837,6 +1837,123 @@ def _source_furniture_pixel_boxes(book, pno, figure):
             protected.append(tuple(region['bbox']))
     return furniture, protected
 
+def _native_margin_furniture_pixel_boxes(doc, book, pno, figure):
+    """Bind a canonical footer folio to an original full-frame native scan.
+
+    An empty native geometry record is explicit source evidence, not a guessed
+    reading frame. Native vector pages, transformed/cropped scans and uncertain
+    role ownership do not authorize erasure. The caller still protects required
+    source resources; the component eraser protects all surrounding source ink.
+    """
+    inventory = getattr(book, 'source_inventory', {}).get(pno, {})
+    if (inventory.get('source_geometry') != {}
+            or figure.get('source_geometry', {}) != {}
+            or figure.get('pno') != pno or figure.get('full_page')
+            or figure.get('found') not in ('ocr_uncertain_region',
+                                         'scan_figure_band', 'scan_figure_side')):
+        return [], []
+
+    def valid(box):
+        return (len(box) == 4 and all(math.isfinite(float(v)) for v in box)
+                and box[0] < box[2] and box[1] < box[3])
+
+    def same(a, b):
+        return len(a) == len(b) and all(abs(x-y) < .0001 for x, y in zip(a, b))
+
+    def overlap(a, b):
+        return a[0] < b[2] and b[0] < a[2] and a[1] < b[3] and b[1] < a[3]
+
+    try:
+        page = doc[pno]
+        rect = tuple(page.rect)
+        native_media = tuple(page.mediabox * page.transformation_matrix)
+        if page.rotation or not same(native_media, rect):
+            return [], []
+        crop = figure.get('bbox', ())
+        if (not valid(crop) or crop[0] < rect[0] or crop[1] < rect[1]
+                or crop[2] > rect[2] or crop[3] > rect[3]):
+            return [], []
+        full_bitmaps = [image for image in page.get_image_info()
+                        if same(image.get('bbox', ()), rect)
+                        and image.get('width', 0) > 0 and image.get('height', 0) > 0
+                        and same(image.get('transform', ()),
+                                 (rect[2]-rect[0], 0, 0, rect[3]-rect[1], rect[0], rect[1]))]
+        captured_bitmaps = []
+        for image in inventory.get('raw_images', ()):
+            box = image.get('bbox', ()) if isinstance(image, dict) else image.bbox
+            area = image.get('area_ratio', 0) if isinstance(image, dict) else image.area_ratio
+            if same(box, rect) and area >= .99:
+                captured_bitmaps.append(image)
+        if not full_bitmaps or not captured_bitmaps:
+            return [], []
+        native_lines = [line for block in page.get_text('dict')['blocks']
+                        for line in block.get('lines', ())]
+    except (AttributeError, TypeError, ValueError, IndexError):
+        return [], []
+
+    from . import source_inventory
+    source_rows = inventory.get('lines', ())
+    rows = {row['id']: row for row in source_rows}
+    owners = inventory.get('ownership', ())
+    if len(rows) != len(source_rows):
+        return [], []
+    regions = inventory.get('regions', ())
+    proved = set()
+    for region in regions:
+        box, ids = region.get('bbox', ()), region.get('line_ids', ())
+        if (region.get('suggested_kind') != 'furniture'
+                or region.get('reason') != 'contents_footer_folio'
+                or region.get('geometry_status') != 'valid' or not ids
+                or not valid(box) or box[1] < rect[3]-(rect[3]-rect[1])*.12
+                or box[3] > rect[3] or not overlap(box, crop)
+                or any(lid not in rows for lid in ids)):
+            continue
+        if any(rows[lid].get('sha256') != source_inventory.digest(rows[lid]['source'])
+               or not valid(rows[lid]['source'].bbox)
+               or not (box[0] <= rows[lid]['source'].bbox[0]
+                       and box[1] <= rows[lid]['source'].bbox[1]
+                       and rows[lid]['source'].bbox[2] <= box[2]
+                       and rows[lid]['source'].bbox[3] <= box[3]) for lid in ids):
+            continue
+        # Equal-sized adjacent scans are not interchangeable source pages.
+        # Rebind each selected captured row to this original PDF's native line;
+        # the canonical role alone cannot authorize changing another scan.
+        if any(len([line for line in native_lines
+                    if same(line.get('bbox', ()), rows[lid]['source'].bbox)
+                    and ''.join(span.get('text', '') for span in line.get('spans', ()))
+                        == rows[lid]['source'].text]) != 1 for lid in ids):
+            continue
+        if any([owner for owner in owners if owner.get('line_id') == lid] !=
+               [dict(line_id=lid, representation='text', owner_id=region['id'])]
+               for lid in ids):
+            continue
+        if any(other is not region and any(lid in other.get('line_ids', ())
+                   or lid in other.get('caption_line_ids', ()) for lid in ids)
+               for other in regions):
+            continue
+        protected_territory = [other['bbox'] for other in regions
+                              if other.get('suggested_kind') in ('caption', 'table', 'note')
+                              and other.get('bbox') and valid(other['bbox'])]
+        for element in (getattr(book, 'pages', {}) or {}).get(pno, ()):
+            if element.kind in ('p', 'h', 'caption'):
+                protected_territory.extend(element.line_boxes or
+                                          ([element.bbox] if element.bbox else []))
+        protected_territory.extend(note.bbox for note in getattr(book, 'notes', ())
+                                   if note.pno == pno and note.bbox)
+        if any(valid(other) and overlap(box, other) for other in protected_territory):
+            continue
+        proved.update(ids)
+    if not proved:
+        return [], []
+    furniture, protected = [], []
+    for lid, row in rows.items():
+        destination = furniture if lid in proved else protected
+        destination.extend(tuple(span.bbox) for span in row['source'].spans
+                           if span.text.strip() and valid(span.bbox))
+    protected.extend(protected_territory)
+    return furniture, protected
+
+
 def _figure_images(chapters, doc, book, package, figure_transform=None, owned_images=(),
                    runtime_progress=None, required_source_regions=(),
                    figure_presentation=None):
@@ -1963,6 +2080,9 @@ def _figure_images(chapters, doc, book, package, figure_transform=None, owned_im
         if data is not None:
             if src not in required_source_regions and not whole_page_fallback:
                 furniture, protected = _source_furniture_pixel_boxes(book, pno, figure)
+                if not furniture and tuple(bbox) == tuple(figure['bbox']):
+                    furniture, protected = _native_margin_furniture_pixel_boxes(
+                        doc, book, pno, figure)
                 if furniture:
                     data, exclusions = _exclude_source_furniture_pixels(
                         data, bbox, furniture, protected)

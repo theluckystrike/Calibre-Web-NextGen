@@ -1,0 +1,61 @@
+{
+  "schema": "native-margin-furniture-publication-source-fixture-1",
+  "source_pdf_sha256": "ec9ef4694b1fe7b073695d4773d5a11089e690f84525b81e8c67262e0da69b12",
+  "source_page_number": 16,
+  "source_pdf_page_index": 16,
+  "source_page_pdf_sha256": "0b581aab039d6698f6b4afe04e361f94d4c5a394fbe3060cd74e31ca38df4a30",
+  "source_page_png_sha256": "5b18aee9850213c54ed3da9945cb9da05ca61b5eabfaa4bb75c0ef88087fdcdd",
+  "source_page_png_size": [
+    806,
+    1212
+  ],
+  "source_figure_crop_sha256": "f1fe278e53ab78191a494704c6a31fa4d54d7b266f40247476d0720012d57309",
+  "source_figure_crop_pixel_size": [
+    604,
+    1032
+  ],
+  "source_native_frame": [
+    0.0,
+    0.0,
+    402.8500061035156,
+    606.0
+  ],
+  "source_rotation": 0,
+  "source_geometry": {},
+  "canonical_figure": {
+    "asset_index": 0,
+    "found": "ocr_uncertain_region",
+    "bbox": [
+      51.099998474121094,
+      45.449999999999996,
+      352.9426574707031,
+      560.5500000000001
+    ],
+    "source_geometry": {},
+    "full_page": false,
+    "needs_ink": false,
+    "region_id": "r0"
+  },
+  "qualified_furniture_role": {
+    "reason": "contents_footer_folio",
+    "book": 570,
+    "page": 16,
+    "line_id": "l58",
+    "kind": "printed_furniture",
+    "text": "xv",
+    "bbox": [
+      199.3000030517578,
+      551.1199340820312,
+      207.34971618652344,
+      558.8897705078125
+    ],
+    "row_sha256": "c1d18f63971d3db4f077b99a7d486787e2f94625b62333f9ccc037817dff576e"
+  },
+  "source_inventory_sha256": "7dc040705436476af5708f6821b967d18fbba0e9587a2b608c99274d78506ab9",
+  "source_inventory_scope": "complete canonical source inventory for original PDF page 16, from the pinned source sweep; source_geometry explicit {} and furniture ownership is the canonical contents_footer_folio region",
+  "provenance": "source_page.pdf and source_page.png are extracted/rendered from immutable original book570.pdf zero-based doc[16] (17th page, printed xv); wrong_prior_page.pdf is doc[15] (16th page, printed xiv) and is reserved for a cross-page mismatch negative. Source crop is the exact canonical figure bbox rendered from doc[16]. Canonical inventory is final source-stage evidence bound to original PDF SHA; no EPUB image used as expected-content gold.",
+  "source_inventory_source_raw_sha256": "15020c6a08e008a572d0c5244b8f3c1d7493dcf4e68d2ee2e5381a09922e9db4",
+  "negative_control_pdf": "wrong_prior_page.pdf",
+  "negative_control_pdf_page_index": 15,
+  "negative_control_expected_printed_folio": "xiv"
+}
