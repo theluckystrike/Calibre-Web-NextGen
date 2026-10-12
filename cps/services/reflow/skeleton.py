@@ -3504,6 +3504,18 @@ def _split_off_notes(raw, style, skel, pixel_probe=None, _detached_pass=True):
                 notes.extend(_notes_in_block(blk, notes, distinct_opening=id(blk) in damaged_openings))
 
     if notes:
+        # Zone boundaries use extraction indices, which can place a marker
+        # after its citation or in the neighboring raw block. Preserve those
+        # established markers' original lexical associations before artwork
+        # discovery, rather than leaving complete source notes in body crops.
+        footer_lines = [line for block in eligible for line in block.lines
+                        if id(line) not in field_rows
+                        and not _squashed_caption(line.stripped)
+                        and not _furniture_reason(line, raw, style)]
+        footer = extract.Block(number=-1, lines=footer_lines,
+                               bbox=_lines_bbox(footer_lines, (0, 0, 0, 0)))
+        pairs = _source_note_marker_pairs(footer)
+        body, notes = _complete_source_note_pairs(body, notes, pairs)
         numbers = [n.number for n in notes if n.number is not None]
         if len(numbers) != len(set(numbers)):
             skel.reasons.append("duplicate_note_numbers")
@@ -3606,6 +3618,65 @@ def _source_note_marker_pairs(block):
     counts = {id(line): sum(peer is line for peer in proposed.values())
               for line in proposed.values()}
     return {key: line for key, line in proposed.items() if counts[id(line)] == 1}
+
+
+def _complete_source_note_pairs(body, notes, pairs):
+    """Retain measured citation rows with already established note markers.
+
+    Only original eligible footer rows enter the pairing proof. It grants no
+    new marker authority or numeric identity: source baselines and bounded
+    lanes project complete associations across extraction block boundaries.
+    """
+    owners = {id(line): index for index, note in enumerate(notes) for line in note.lines}
+    pair_ids = {key for key in pairs if key in owners}
+    affected = {owners[key] for key in pair_ids
+                if owners.get(id(pairs[key])) != owners[key]
+                or any(other != key and owners.get(id(pairs[other])) == owners[key]
+                       for other in pair_ids)}
+    if not affected:
+        return body, notes
+    affected.update(owners[id(pairs[key])] for key in pair_ids
+                    if owners[key] in affected and id(pairs[key]) in owners)
+    active = {key for key in pair_ids if owners[key] in affected}
+    moved = active | {id(pairs[key]) for key in active}
+    retained = [replace(block, lines=kept, bbox=_lines_bbox(kept, block.bbox))
+                for block in body
+                if (kept := [line for line in block.lines if id(line) not in moved])]
+    output = []
+    for index, note in enumerate(notes):
+        if index not in affected:
+            output.append(note)
+            continue
+        markers = [line for line in note.lines if id(line) in active]
+        extras = [line for line in note.lines if id(line) not in moved]
+        if not markers:
+            if extras:
+                output.append(replace(note, lines=extras, bbox=_lines_bbox(extras, note.bbox)))
+            continue
+        groups = [[marker, pairs[id(marker)]] for marker in markers]
+        # Existing note continuations retain their role. With several source
+        # labels, their measured vertical order identifies the preceding text;
+        # an unmatched leading continuation remains a separate original note.
+        leading = []
+        for line in extras:
+            preceding = [group for group in groups if group[1].bbox[1] <= line.bbox[1]]
+            if preceding:
+                max(preceding, key=lambda group: group[1].bbox[1]).append(line)
+            elif len(groups) == 1:
+                groups[0].append(line)
+            else:
+                leading.append(line)
+        if leading:
+            output.append(replace(note, lines=leading,
+                                  bbox=_lines_bbox(leading, note.bbox)))
+        for group in groups:
+            # A shared marker-only zone supplies no independently assigned
+            # number. Keep that uncertainty while preserving each full note.
+            number = note.number if (len(groups) == 1
+                                     or group[0] is note.lines[0]) else None
+            output.append(replace(note, number=number, lines=group,
+                                  bbox=_lines_bbox(group, note.bbox)))
+    return retained, sorted(output, key=lambda note: (note.bbox[1], note.bbox[0]))
 
 
 def _notes_in_block(blk, existing, distinct_opening=False):
