@@ -564,6 +564,7 @@ class ScanPixelProbe(object):
         self._doc = doc
         self._pno = pno
         self._mask = list(mask)
+        self._source_raster = None
 
     def channels(self, rect):
         return ink_channel(self._doc, self._pno, rect, mask=self._mask)
@@ -572,17 +573,120 @@ class ScanPixelProbe(object):
         return region_has_ink(self._doc, self._pno, rect, mask=self._mask)
 
     def source_has_ink(self, rect):
-        """Inspect actual source pixels, including text masked for art detection."""
+        """Retain the existing unmasked artwork-occupancy query contract."""
         return region_has_ink(self._doc, self._pno, rect, mask=())
 
     def source_ink_bounds(self, rect):
+        """Retain original calibrated extent measurements without text masks.
+
+        Existing marker and rule callers measure the clipped 1.5x extent,
+        including its original one-pixel conservative pad. Opaque source cuts
+        instead use original_ink_bounds/original_has_ink below.
+        """
+        # Keep the bounded immutable source snapshot available to every
+        # unmasked query. Its stricter extent is not this caller's calibrated
+        # legacy extent; returned geometry still uses the original clip.
+        self.original_ink_bounds(rect)
+        return ScanPixelProbe(self._doc, self._pno).ink_bounds(rect)
+
+    def original_has_ink(self, rect):
+        """Any original dark pixel in the stable full-frame source raster."""
+        return self.original_ink_bounds(rect) is not None
+
+    def original_ink_bounds(self, rect):
         """Measure printed context separators without text-box masks.
 
         Hidden-layer glyph boxes can extend over a real footnote divider. The
         caller supplies the gap outside those boxes; masking them would erase
         the very source boundary being inspected.
         """
-        return ScanPixelProbe(self._doc, self._pno).ink_bounds(rect)
+        if len(rect) != 4 or not all(math.isfinite(float(v)) for v in rect):
+            raise ValueError('invalid ink geometry')
+        if rect[2] <= rect[0] or rect[3] <= rect[1]:
+            raise ValueError('empty ink geometry')
+        frame = self._doc[self._pno].rect
+        clip = pymupdf.Rect(rect) & frame
+        if clip.is_empty:
+            return None
+        if self._source_raster is None:
+            # Bounded source queries have differed between cold and previously
+            # rendered MuPDF pages. Measure every unmasked query in the same
+            # full-frame pixels, independently of preview order. Masked artwork
+            # queries retain their existing renderer.
+            scale = _bounded_scale(frame, 2)
+            # SourceDisplay also budgets outward-rounded raster dimensions.
+            # Bound them here before rendering so a reading-frame facade does
+            # not silently use a smaller matrix than the one cached below.
+            if ((math.ceil(frame.width*scale)+2)*
+                    (math.ceil(frame.height*scale)+2) > MAX_RASTER_PIXELS):
+                low, high = 0., scale
+                for _ in range(48):
+                    mid = (low+high)/2
+                    if ((math.ceil(frame.width*mid)+2)*
+                            (math.ceil(frame.height*mid)+2) <= MAX_RASTER_PIXELS):
+                        low = mid
+                    else:
+                        high = mid
+                scale = low
+            pix = self._doc[self._pno].get_pixmap(
+                matrix=pymupdf.Matrix(scale, scale), colorspace=pymupdf.csGRAY,
+                alpha=False)
+            if (pix.n != 1 or pix.width*pix.height > MAX_RASTER_PIXELS
+                    or not math.floor(frame.width*scale) <= pix.width <= math.ceil(frame.width*scale)+1
+                    or not math.floor(frame.height*scale) <= pix.height <= math.ceil(frame.height*scale)+1):
+                raise ValueError('incompatible source raster geometry')
+            self._source_raster = (pix.samples, pix.width, pix.height, scale)
+        data, width, height, scale = self._source_raster
+        x0 = max(0, math.floor((clip.x0-frame.x0)*scale))
+        y0 = max(0, math.floor((clip.y0-frame.y0)*scale))
+        x1 = min(width, math.ceil((clip.x1-frame.x0)*scale))
+        y1 = min(height, math.ceil((clip.y1-frame.y0)*scale))
+        xs, ys = [], []
+        for y in range(y0, y1):
+            dark = [x for x in range(x0, x1) if data[y*width+x] < 230]
+            if dark:
+                xs.extend((dark[0], dark[-1])); ys.append(y)
+        if not xs:
+            return None
+        return (max(clip.x0, frame.x0+(min(xs)-1)/scale),
+                max(clip.y0, frame.y0+(ys[0]-1)/scale),
+                min(clip.x1, frame.x0+(max(xs)+2)/scale),
+                min(clip.y1, frame.y0+(ys[-1]+2)/scale))
+
+    def source_ink_components(self, rect):
+        """Connected original ink footprints in the stable unmasked raster.
+
+        Components are measured, never decoded. This distinguishes a compact
+        detached mark from a neighboring long separator without cropping the
+        mark to make its geometry fit.
+        """
+        if self.original_ink_bounds(rect) is None:
+            return []
+        frame = self._doc[self._pno].rect
+        clip = pymupdf.Rect(rect) & frame
+        data, width, height, scale = self._source_raster
+        x0 = max(0, math.floor((clip.x0-frame.x0)*scale))
+        y0 = max(0, math.floor((clip.y0-frame.y0)*scale))
+        x1 = min(width, math.ceil((clip.x1-frame.x0)*scale))
+        y1 = min(height, math.ceil((clip.y1-frame.y0)*scale))
+        dark = {(x,y) for y in range(y0,y1) for x in range(x0,x1)
+                if data[y*width+x] < 230}
+        components = []
+        while dark:
+            seed = dark.pop(); stack = [seed]; points = [seed]
+            while stack:
+                x,y = stack.pop()
+                for dx in (-1,0,1):
+                    for dy in (-1,0,1):
+                        neighbor = (x+dx,y+dy)
+                        if neighbor in dark:
+                            dark.remove(neighbor); stack.append(neighbor); points.append(neighbor)
+            if len(points) >= 4:
+                components.append((frame.x0+min(x for x,y in points)/scale,
+                    frame.y0+min(y for x,y in points)/scale,
+                    frame.x0+(max(x for x,y in points)+1)/scale,
+                    frame.y0+(max(y for x,y in points)+1)/scale))
+        return sorted(components)
 
     def source_raised_prefix(self, word_bbox):
         """Measure an isolated raised ink prefix inside a merged OCR word box.
